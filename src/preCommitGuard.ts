@@ -1,7 +1,5 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { SimpleGit } from 'simple-git';
 import { GitProfile } from './types';
 
 const HOOK_MARKER = '# git-switcher-pre-commit-guard';

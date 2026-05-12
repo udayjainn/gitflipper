@@ -41,20 +41,20 @@ export function activate(context: vscode.ExtensionContext) {
 
   async function initFolder(folder: vscode.WorkspaceFolder): Promise<FolderState | undefined> {
     const git = simpleGit(folder.uri.fsPath);
-    try {
-      await git.checkIsRepo();
-    } catch {
-      return undefined;
-    }
+    const isRepo = await git.checkIsRepo();
+    if (!isRepo) { return undefined; }
     return { folder, git };
   }
 
-  async function resolveFolder(state: FolderState): Promise<void> {
+  async function resolveAndApplyFolder(state: FolderState): Promise<void> {
     const overrides = context.workspaceState.get<Record<string, string>>(OVERRIDE_KEY, {});
     const override = overrides[state.folder.uri.fsPath];
     state.resolved = await resolver.resolve(state.folder.uri.fsPath, state.git, override);
 
     if (!state.resolved) { return; }
+
+    // Check mismatch before applying so the warning shows the original repo identity
+    await checkMismatch(state);
 
     const autoSwitch = vscode.workspace.getConfiguration('gitSwitcher').get<boolean>('autoSwitch', true);
     if (autoSwitch) {
@@ -76,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
       const state = await initFolder(folder);
       if (state) {
         folderStates.set(folder.uri.fsPath, state);
-        await resolveFolder(state);
+        await resolveAndApplyFolder(state);
       }
     }
 
@@ -180,7 +180,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       const state = folderStates.get(active.uri.fsPath);
       if (state) {
-        await resolveFolder(state);
+        await resolveAndApplyFolder(state);
         updateStatusBar();
       }
 
@@ -223,7 +223,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       const state = folderStates.get(active.uri.fsPath);
       if (state) {
-        await resolveFolder(state);
+        await resolveAndApplyFolder(state);
         updateStatusBar();
       }
 

@@ -20,7 +20,7 @@ export class SshKeyManager {
 
   private async applyViaEnv(keyPath: string): Promise<void> {
     const expandedPath = this.expandHome(keyPath);
-    const sshCmd = `ssh -i ${expandedPath} -o IdentitiesOnly=yes`;
+    const sshCmd = `ssh -i "${expandedPath}" -o IdentitiesOnly=yes`;
 
     const platform = process.platform === 'darwin' ? 'osx'
       : process.platform === 'win32' ? 'windows'
