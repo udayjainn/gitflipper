@@ -117,7 +117,7 @@ export class Onboarding {
       return true;
     }
 
-    return action === 'Later';
+    return false;
   }
 
   private suggestName(entry: IncludeIfEntry): string {

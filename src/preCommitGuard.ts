@@ -9,7 +9,7 @@ function buildHookScript(): string {
   return [
     '#!/bin/sh',
     HOOK_MARKER,
-    `EXPECTED_FILE="$(git rev-parse --git-dir)/${EXPECTED_FILE}"`,
+    'EXPECTED_FILE="$(git rev-parse --git-dir)/' + EXPECTED_FILE + '"',
     'if [ ! -f "$EXPECTED_FILE" ]; then',
     '  exit 0',
     'fi',

@@ -114,6 +114,13 @@ export function activate(context: vscode.ExtensionContext) {
 
     const multiRoot = (vscode.workspace.workspaceFolders?.length || 0) > 1;
     statusBar.update(state.resolved, multiRoot ? state.folder.name : undefined);
+
+    // In multi-root, update SSH key to match the active folder
+    if (state.resolved?.profile.sshKeyPath) {
+      sshManager.applyKey(state.resolved.profile.sshKeyPath);
+    } else {
+      sshManager.clearEnv();
+    }
   }
 
   // --- Commands ---
