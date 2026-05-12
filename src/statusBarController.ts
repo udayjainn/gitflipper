@@ -9,9 +9,11 @@ export class StatusBarController {
     this.item.command = 'gitSwitcher.switchProfile';
   }
 
-  update(resolved: ResolvedProfile | undefined): void {
+  update(resolved: ResolvedProfile | undefined, folderName?: string): void {
+    const prefix = folderName ? `[${folderName}] ` : '';
+
     if (!resolved) {
-      this.item.text = '$(alert) Git: No Profile';
+      this.item.text = `$(alert) ${prefix}Git: No Profile`;
       this.item.tooltip = 'No Git Switcher profile configured for this workspace. Click to select one.';
       this.item.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
       this.item.show();
@@ -24,8 +26,8 @@ export class StatusBarController {
       : source === 'default' ? '$(info)'
       : '$(git-commit)';
 
-    this.item.text = `${icon} Git: ${profile.name} (${profile.email})`;
-    this.item.tooltip = `Profile: ${profile.name}\nSource: ${source}\nClick to switch`;
+    this.item.text = `${icon} ${prefix}Git: ${profile.name} (${profile.email})`;
+    this.item.tooltip = `Profile: ${profile.name}\nEmail: ${profile.email}\nSource: ${source}\nClick to switch`;
     this.item.backgroundColor = source === 'manual-override'
       ? new vscode.ThemeColor('statusBarItem.warningBackground')
       : undefined;
