@@ -22,16 +22,9 @@ export class SshKeyManager {
     const expandedPath = this.expandHome(keyPath);
     const sshCmd = `ssh -i "${expandedPath}" -o IdentitiesOnly=yes`;
 
-    const platform = process.platform === 'darwin' ? 'osx'
-      : process.platform === 'win32' ? 'windows'
-      : 'linux';
-
-    const terminalEnv = vscode.workspace.getConfiguration('terminal.integrated.env');
-    const current = terminalEnv.get<Record<string, string>>(platform, {});
-    await terminalEnv.update(platform, {
-      ...current,
-      GIT_SSH_COMMAND: sshCmd,
-    }, vscode.ConfigurationTarget.Workspace);
+    // Set on the process so simple-git and child processes pick it up at runtime
+    // without writing user-specific paths to any settings file
+    process.env['GIT_SSH_COMMAND'] = sshCmd;
   }
 
   private async applyViaAgent(keyPath: string): Promise<void> {

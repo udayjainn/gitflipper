@@ -56,35 +56,36 @@ export class Onboarding {
   }
 
   private async offerImport(entries: IncludeIfEntry[]): Promise<void> {
-    const descriptions = entries
-      .map(e => `  ${e.condition} → ${e.userName || '?'} <${e.email || '?'}>`)
-      .join('\n');
+    const validEntries = entries.filter(e => e.email && e.userName);
+    if (validEntries.length === 0) {
+      await this.offerCreateProfile();
+      return;
+    }
+
+    const labels = validEntries
+      .map(e => `${this.suggestName(e)}: ${e.userName} <${e.email}>`)
+      .join(', ');
 
     const action = await vscode.window.showInformationMessage(
-      `Git Switcher found ${entries.length} existing includeIf rule(s) in your .gitconfig:\n${descriptions}\n\nImport them as profiles?`,
+      `Git Switcher found ${validEntries.length} identity rule(s) in .gitconfig: ${labels}. Import as profiles?`,
       'Import All',
       'Skip',
     );
 
     if (action !== 'Import All') {
-      await this.offerCreateProfile();
+      if (action === 'Skip') {
+        await this.offerCreateProfile();
+      }
       return;
     }
 
     let imported = 0;
-    for (const entry of entries) {
-      if (!entry.email || !entry.userName) { continue; }
-
-      const name = await vscode.window.showInputBox({
-        prompt: `Profile name for ${entry.email} (${entry.condition})`,
-        value: this.suggestName(entry),
-      });
-      if (!name) { continue; }
-
+    for (const entry of validEntries) {
+      const suggestedName = this.suggestName(entry);
       const profile: GitProfile = {
-        name,
-        email: entry.email,
-        userName: entry.userName,
+        name: suggestedName,
+        email: entry.email!,
+        userName: entry.userName!,
         directories: [this.expandHome(entry.condition)],
       };
 
@@ -93,7 +94,7 @@ export class Onboarding {
     }
 
     if (imported > 0) {
-      vscode.window.showInformationMessage(`Imported ${imported} profile(s) from .gitconfig.`);
+      vscode.window.showInformationMessage(`Imported ${imported} profile(s): ${validEntries.map(e => this.suggestName(e)).join(', ')}.`);
     }
   }
 
