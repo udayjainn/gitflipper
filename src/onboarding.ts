@@ -4,6 +4,8 @@ import * as path from 'path';
 import * as os from 'os';
 import { GitProfile } from './types';
 import { ProfileManager } from './profileManager';
+import { expandHomePath } from './validation';
+import { showPostImport } from './notifications';
 
 interface IncludeIfEntry {
   condition: string;
@@ -15,7 +17,6 @@ interface IncludeIfEntry {
 export class Onboarding {
   constructor(private profileManager: ProfileManager) {}
 
-  /** Returns true if the user completed onboarding, false if dismissed. */
   async run(): Promise<boolean> {
     const entries = this.parseIncludeIfs();
 
@@ -38,7 +39,7 @@ export class Onboarding {
 
     while ((match = includeIfRegex.exec(content)) !== null) {
       const condition = match[1].trim();
-      const configPath = this.expandHome(match[2].trim());
+      const configPath = expandHomePath(match[2].trim());
 
       const entry: IncludeIfEntry = { condition, configPath };
 
@@ -67,7 +68,7 @@ export class Onboarding {
       .join(', ');
 
     const action = await vscode.window.showInformationMessage(
-      `Git Switcher found ${validEntries.length} identity rule(s) in .gitconfig: ${labels}. Import as profiles?`,
+      `Git Switcher found ${validEntries.length} existing Git identity rule(s) in your ~/.gitconfig file: ${labels}. These are directory-based identity rules you've already set up. Import them as profiles?`,
       'Import All',
       'Skip',
     );
@@ -80,6 +81,7 @@ export class Onboarding {
 
     const usedNames = new Set<string>();
     let imported = 0;
+    const importedNames: string[] = [];
 
     for (const entry of validEntries) {
       let name = this.suggestName(entry);
@@ -92,25 +94,32 @@ export class Onboarding {
         name,
         email: entry.email!,
         userName: entry.userName!,
-        directories: [this.expandHome(entry.condition)],
+        directories: [expandHomePath(entry.condition)],
       };
 
       await this.profileManager.addProfile(profile);
       imported++;
+      importedNames.push(name);
     }
 
     if (imported > 0) {
-      vscode.window.showInformationMessage(`Imported ${imported} profile(s).`);
+      showPostImport(imported, importedNames);
     }
     return true;
   }
 
   private async offerCreateProfile(): Promise<boolean> {
     const action = await vscode.window.showInformationMessage(
-      'Welcome to Git Switcher! No profiles configured yet. Create your first profile?',
+      'Welcome to Git Switcher! Create profiles to automatically switch your Git identity based on which folder you\'re working in.',
+      'Get Started',
       'Create Profile',
       'Later',
     );
+
+    if (action === 'Get Started') {
+      await vscode.commands.executeCommand('gitSwitcher.openWalkthrough');
+      return true;
+    }
 
     if (action === 'Create Profile') {
       await vscode.commands.executeCommand('gitSwitcher.createProfile');
@@ -131,12 +140,5 @@ export class Onboarding {
       return 'Personal';
     }
     return base.charAt(0).toUpperCase() + base.slice(1);
-  }
-
-  private expandHome(p: string): string {
-    if (p.startsWith('~/') || p === '~') {
-      return path.join(os.homedir(), p.slice(1));
-    }
-    return p;
   }
 }

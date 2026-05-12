@@ -1,8 +1,8 @@
-import * as os from 'os';
 import * as path from 'path';
 import { SimpleGit } from 'simple-git';
 import { GitProfile, ResolvedProfile } from './types';
 import { ProfileManager } from './profileManager';
+import { expandHomePath } from './validation';
 
 export class ProfileResolver {
   constructor(private profileManager: ProfileManager) {}
@@ -34,7 +34,7 @@ export class ProfileResolver {
   }
 
   private resolveByDirectory(workspacePath: string): GitProfile | undefined {
-    const normalized = this.normalizePath(this.expandHome(workspacePath));
+    const normalized = this.normalizePath(expandHomePath(workspacePath));
     const profiles = this.profileManager.getProfiles();
 
     let bestMatch: GitProfile | undefined;
@@ -43,7 +43,7 @@ export class ProfileResolver {
     for (const profile of profiles) {
       if (!profile.directories) { continue; }
       for (const dir of profile.directories) {
-        const expandedDir = this.normalizePath(this.expandHome(dir));
+        const expandedDir = this.normalizePath(expandHomePath(dir));
         if (normalized.startsWith(expandedDir) && expandedDir.length > bestLength) {
           bestMatch = profile;
           bestLength = expandedDir.length;
@@ -66,13 +66,6 @@ export class ProfileResolver {
       // no local config set
     }
     return undefined;
-  }
-
-  private expandHome(p: string): string {
-    if (p.startsWith('~/') || p === '~') {
-      return path.join(os.homedir(), p.slice(1));
-    }
-    return p;
   }
 
   private normalizePath(p: string): string {

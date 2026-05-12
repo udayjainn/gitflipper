@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { SshStrategy } from './types';
+import { expandHomePath } from './validation';
 
 const exec = promisify(execFile);
 
@@ -25,7 +26,7 @@ export class SshKeyManager {
   }
 
   private applyViaEnv(keyPath: string): void {
-    const expandedPath = this.expandHome(keyPath);
+    const expandedPath = expandHomePath(keyPath);
     const sshCmd = `ssh -i "${expandedPath}" -o IdentitiesOnly=yes`;
 
     if (this.envCollection) {
@@ -34,7 +35,7 @@ export class SshKeyManager {
   }
 
   private async applyViaAgent(keyPath: string): Promise<void> {
-    const expandedPath = this.expandHome(keyPath);
+    const expandedPath = expandHomePath(keyPath);
 
     try {
       await exec('ssh-add', ['-D']).catch(() => {});
@@ -50,12 +51,5 @@ export class SshKeyManager {
     if (this.envCollection) {
       this.envCollection.delete('GIT_SSH_COMMAND');
     }
-  }
-
-  private expandHome(p: string): string {
-    if (p.startsWith('~/') || p === '~') {
-      return (process.env.HOME || '') + p.slice(1);
-    }
-    return p;
   }
 }

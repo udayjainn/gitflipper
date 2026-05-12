@@ -8,6 +8,12 @@ import { StatusBarController } from './statusBarController';
 import { PreCommitGuard } from './preCommitGuard';
 import { Onboarding } from './onboarding';
 import { ResolvedProfile } from './types';
+import {
+  showProfileApplied,
+  showSshKeyApplied,
+  showNoProfileMatch,
+  showFirstRunWelcome,
+} from './notifications';
 
 const ONBOARDED_KEY = 'gitSwitcher.onboarded';
 const OVERRIDE_KEY = 'gitSwitcher.manualOverride';
@@ -52,12 +58,14 @@ export function activate(context: vscode.ExtensionContext) {
     const override = overrides[state.folder.uri.fsPath];
     state.resolved = await resolver.resolve(state.folder.uri.fsPath, state.git, override);
 
-    if (!state.resolved) { return; }
+    if (!state.resolved) {
+      showNoProfileMatch(state.folder.name);
+      return;
+    }
 
     const autoSwitch = vscode.workspace.getConfiguration('gitSwitcher').get<boolean>('autoSwitch', true);
 
     if (autoSwitch) {
-      // Check mismatch before applying so warning shows the original identity
       const current = await configWriter.getCurrentRepoIdentity(state.git);
       if (current.email && current.email !== state.resolved.profile.email) {
         await showMismatchWarning(state, current.email);
@@ -67,9 +75,12 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (state.resolved.profile.sshKeyPath) {
         await sshManager.applyKey(state.resolved.profile.sshKeyPath);
+        showSshKeyApplied(state.resolved.profile.sshKeyPath);
       }
 
       await preCommitGuard.install(state.folder.uri.fsPath, state.resolved.profile);
+
+      showProfileApplied(state.resolved.profile, state.folder.name);
     }
   }
 
@@ -115,7 +126,6 @@ export function activate(context: vscode.ExtensionContext) {
     const multiRoot = (vscode.workspace.workspaceFolders?.length || 0) > 1;
     statusBar.update(state.resolved, multiRoot ? state.folder.name : undefined);
 
-    // In multi-root, update SSH key to match the active folder
     if (state.resolved?.profile.sshKeyPath) {
       sshManager.applyKey(state.resolved.profile.sshKeyPath);
     } else {
@@ -129,7 +139,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('gitSwitcher.showActiveProfile', async () => {
       const active = getActiveFolder();
       if (!active) {
-        vscode.window.showInformationMessage('No workspace open.');
+        vscode.window.showInformationMessage('No workspace open. Open a folder first (File > Open Folder).');
         return;
       }
 
@@ -143,7 +153,7 @@ export function activate(context: vscode.ExtensionContext) {
         const git = simpleGit(active.uri.fsPath);
         const current = await configWriter.getCurrentRepoIdentity(git);
         vscode.window.showInformationMessage(
-          `No profile matched. Repo identity: ${current.name || 'unset'} <${current.email || 'unset'}>`
+          `No profile matched for "${active.name}". Current repo identity: ${current.name || 'unset'} <${current.email || 'unset'}>. Use "Git Switcher: Create Profile" to set one up.`
         );
       }
     }),
@@ -152,7 +162,7 @@ export function activate(context: vscode.ExtensionContext) {
       const profiles = profileManager.getProfiles();
       if (profiles.length === 0) {
         const create = await vscode.window.showWarningMessage(
-          'No profiles configured. Create one now?',
+          'No profiles configured yet. Create one to get started.',
           'Create Profile',
         );
         if (create) {
@@ -163,7 +173,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       const active = getActiveFolder();
       if (!active) {
-        vscode.window.showInformationMessage('No workspace open.');
+        vscode.window.showInformationMessage('No workspace open. Open a folder first (File > Open Folder).');
         return;
       }
 
@@ -198,7 +208,6 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('gitSwitcher.createProfile', async () => {
       const profile = await profileManager.createProfileInteractive();
       if (profile) {
-        vscode.window.showInformationMessage(`Profile "${profile.name}" created.`);
         await refreshAll();
       }
     }),
@@ -234,6 +243,14 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.window.showInformationMessage(`Reset "${active.name}" to automatic profile detection.`);
     }),
 
+    vscode.commands.registerCommand('gitSwitcher.openWalkthrough', () => {
+      vscode.commands.executeCommand(
+        'workbench.action.openWalkthrough',
+        'uday-jain.git-switcher#gitSwitcher.gettingStarted',
+        false,
+      );
+    }),
+
     // --- Event Listeners ---
 
     vscode.window.onDidChangeActiveTextEditor(() => {
@@ -258,11 +275,23 @@ export function activate(context: vscode.ExtensionContext) {
   // First-run onboarding
   const onboarded = context.globalState.get<boolean>(ONBOARDED_KEY, false);
   if (!onboarded && profileManager.getProfiles().length === 0) {
-    const onboarding = new Onboarding(profileManager);
-    onboarding.run().then((completed) => {
-      if (completed) {
+    showFirstRunWelcome().then(async (action) => {
+      if (action === 'Get Started') {
+        vscode.commands.executeCommand('gitSwitcher.openWalkthrough');
         context.globalState.update(ONBOARDED_KEY, true);
-        refreshAll();
+      } else if (action === 'Create Profile') {
+        await vscode.commands.executeCommand('gitSwitcher.createProfile');
+        context.globalState.update(ONBOARDED_KEY, true);
+      } else if (action === 'Later') {
+        // Don't mark onboarded — show again next time
+      } else {
+        // Also try existing includeIf import
+        const onboarding = new Onboarding(profileManager);
+        const completed = await onboarding.run();
+        if (completed) {
+          context.globalState.update(ONBOARDED_KEY, true);
+          refreshAll();
+        }
       }
     });
   }

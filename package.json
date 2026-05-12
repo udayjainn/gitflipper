@@ -29,32 +29,32 @@
         "gitSwitcher.profiles": {
           "type": "array",
           "default": [],
-          "description": "List of Git identity profiles.",
+          "markdownDescription": "Your Git identity profiles. Each profile stores a **name**, **email**, and optionally an **SSH key** and **directory rules**.\n\nExample:\n```json\n[\n  {\n    \"name\": \"Work\",\n    \"email\": \"you@company.com\",\n    \"userName\": \"Your Name\",\n    \"sshKeyPath\": \"~/.ssh/id_work\",\n    \"directories\": [\"~/work\"]\n  }\n]\n```\n\nUse the command **Git Switcher: Create Profile** for a guided setup wizard.",
           "items": {
             "type": "object",
             "properties": {
               "name": {
                 "type": "string",
-                "description": "Profile display name (e.g., 'Work', 'Personal')"
+                "markdownDescription": "A display name for this profile (e.g., `Work`, `Personal`, `Open Source`). This appears in the status bar and command palette."
               },
               "email": {
                 "type": "string",
-                "description": "Git user email"
+                "markdownDescription": "The email address that will appear on your Git commits. Make sure this matches what your Git hosting service expects (e.g., your GitHub or Bitbucket account email)."
               },
               "userName": {
                 "type": "string",
-                "description": "Git user name"
+                "markdownDescription": "The name that will appear on your Git commits (e.g., `Jane Doe`). This is your display name, not your username."
               },
               "sshKeyPath": {
                 "type": "string",
-                "description": "Path to SSH private key for this profile"
+                "markdownDescription": "Path to the **private** SSH key file for this profile (e.g., `~/.ssh/id_ed25519_work`). This is the file **without** the `.pub` extension.\n\nSSH keys are used to authenticate with remote Git servers like GitHub or Bitbucket. If you're not sure what this is, you can leave it empty."
               },
               "directories": {
                 "type": "array",
                 "items": {
                   "type": "string"
                 },
-                "description": "Directories that should use this profile (longest prefix match wins)"
+                "markdownDescription": "Directories where this profile should automatically activate. When you open a project inside any of these directories, Git Switcher will set this profile's identity.\n\nExample: Setting `~/work` will match `~/work/project-a`, `~/work/project-b`, etc.\n\nIf multiple profiles match, the most specific (longest) path wins."
               }
             },
             "required": [
@@ -67,17 +67,17 @@
         "gitSwitcher.defaultProfile": {
           "type": "string",
           "default": "",
-          "description": "Name of the default profile when no directory rule matches."
+          "markdownDescription": "The profile to use when no directory rule matches the current workspace. Set this to the name of one of your profiles (e.g., `Personal`).\n\nLeave empty to show a warning when no profile matches."
         },
         "gitSwitcher.warnOnMismatch": {
           "type": "boolean",
           "default": true,
-          "description": "Show a warning when the active Git identity doesn't match the expected profile."
+          "markdownDescription": "Show a notification when Git Switcher detects that the repo's current identity is different from the expected profile. This helps catch cases where your identity was changed manually or by another tool."
         },
         "gitSwitcher.autoSwitch": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically apply the matching profile when opening a workspace."
+          "markdownDescription": "Automatically apply the matching profile when you open a workspace. When enabled, Git Switcher writes `user.name` and `user.email` to the repo's local Git config.\n\nDisable this if you prefer to switch profiles manually using the **Git Switcher: Switch Profile** command."
         },
         "gitSwitcher.sshStrategy": {
           "type": "string",
@@ -86,7 +86,7 @@
             "ssh-agent"
           ],
           "default": "GIT_SSH_COMMAND",
-          "description": "Strategy for SSH key switching."
+          "markdownDescription": "How Git Switcher applies SSH keys:\n\n- **`GIT_SSH_COMMAND`** (recommended) — Sets an environment variable in VS Code's terminal. Safe, scoped to VS Code, no side effects on other apps.\n- **`ssh-agent`** — Adds/removes keys from your system's SSH agent. Works system-wide but affects all terminal sessions, not just VS Code."
         }
       }
     },
@@ -114,6 +114,60 @@
       {
         "command": "gitSwitcher.removeHooks",
         "title": "Git Switcher: Remove Pre-Commit Hooks"
+      },
+      {
+        "command": "gitSwitcher.openWalkthrough",
+        "title": "Git Switcher: Getting Started"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "gitSwitcher.gettingStarted",
+        "title": "Getting Started with Git Switcher",
+        "description": "Learn how to set up automatic Git identity switching in a few simple steps.",
+        "steps": [
+          {
+            "id": "understand",
+            "title": "Why Git Identities Matter",
+            "description": "Understand the problem Git Switcher solves — no Git expertise required.",
+            "media": {
+              "markdown": "media/walkthrough/understand.md"
+            }
+          },
+          {
+            "id": "createProfile",
+            "title": "Create Your First Profile",
+            "description": "Set up a profile with your name, email, and SSH key.\n\n[Create Profile](command:gitSwitcher.createProfile)",
+            "media": {
+              "markdown": "media/walkthrough/create-profile.md"
+            },
+            "completionEvents": [
+              "onCommand:gitSwitcher.createProfile"
+            ]
+          },
+          {
+            "id": "directoryRules",
+            "title": "Set Up Directory Rules",
+            "description": "Map folders to profiles so switching happens automatically.\n\n[Edit Profiles](command:gitSwitcher.editProfiles)",
+            "media": {
+              "markdown": "media/walkthrough/directory-rules.md"
+            },
+            "completionEvents": [
+              "onCommand:gitSwitcher.editProfiles"
+            ]
+          },
+          {
+            "id": "verify",
+            "title": "Verify It Works",
+            "description": "Check the status bar and test with a commit.\n\n[Show Active Profile](command:gitSwitcher.showActiveProfile)",
+            "media": {
+              "markdown": "media/walkthrough/verify.md"
+            },
+            "completionEvents": [
+              "onCommand:gitSwitcher.showActiveProfile"
+            ]
+          }
+        ]
       }
     ]
   },
