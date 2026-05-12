@@ -34,7 +34,7 @@ export class ProfileResolver {
   }
 
   private resolveByDirectory(workspacePath: string): GitProfile | undefined {
-    const normalized = this.expandHome(workspacePath);
+    const normalized = this.normalizePath(this.expandHome(workspacePath));
     const profiles = this.profileManager.getProfiles();
 
     let bestMatch: GitProfile | undefined;
@@ -43,7 +43,7 @@ export class ProfileResolver {
     for (const profile of profiles) {
       if (!profile.directories) { continue; }
       for (const dir of profile.directories) {
-        const expandedDir = this.expandHome(dir);
+        const expandedDir = this.normalizePath(this.expandHome(dir));
         if (normalized.startsWith(expandedDir) && expandedDir.length > bestLength) {
           bestMatch = profile;
           bestLength = expandedDir.length;
@@ -73,5 +73,10 @@ export class ProfileResolver {
       return path.join(os.homedir(), p.slice(1));
     }
     return p;
+  }
+
+  private normalizePath(p: string): string {
+    const resolved = path.resolve(p);
+    return resolved.endsWith('/') ? resolved : resolved + '/';
   }
 }

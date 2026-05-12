@@ -10,7 +10,6 @@ import { Onboarding } from './onboarding';
 import { ResolvedProfile } from './types';
 
 const ONBOARDED_KEY = 'gitSwitcher.onboarded';
-
 const OVERRIDE_KEY = 'gitSwitcher.manualOverride';
 
 let statusBar: StatusBarController;
@@ -28,6 +27,8 @@ export function activate(context: vscode.ExtensionContext) {
   const sshManager = new SshKeyManager();
   const preCommitGuard = new PreCommitGuard();
   statusBar = new StatusBarController();
+
+  sshManager.setEnvCollection(context.environmentVariableCollection);
 
   const folderStates = new Map<string, FolderState>();
 
@@ -53,11 +54,15 @@ export function activate(context: vscode.ExtensionContext) {
 
     if (!state.resolved) { return; }
 
-    // Check mismatch before applying so the warning shows the original repo identity
-    await checkMismatch(state);
-
     const autoSwitch = vscode.workspace.getConfiguration('gitSwitcher').get<boolean>('autoSwitch', true);
+
     if (autoSwitch) {
+      // Check mismatch before applying so warning shows the original identity
+      const current = await configWriter.getCurrentRepoIdentity(state.git);
+      if (current.email && current.email !== state.resolved.profile.email) {
+        await showMismatchWarning(state, current.email);
+      }
+
       await configWriter.applyProfile(state.resolved.profile, state.git);
 
       if (state.resolved.profile.sshKeyPath) {
@@ -66,6 +71,17 @@ export function activate(context: vscode.ExtensionContext) {
 
       await preCommitGuard.install(state.folder.uri.fsPath, state.resolved.profile);
     }
+  }
+
+  async function showMismatchWarning(state: FolderState, currentEmail: string): Promise<void> {
+    if (!state.resolved || state.resolved.source === 'manual-override') { return; }
+
+    const warnOnMismatch = vscode.workspace.getConfiguration('gitSwitcher').get<boolean>('warnOnMismatch', true);
+    if (!warnOnMismatch) { return; }
+
+    vscode.window.showWarningMessage(
+      `Git Switcher: Switching identity in "${state.folder.name}" from "${currentEmail}" to "${state.resolved.profile.email}" (${state.resolved.profile.name}).`
+    );
   }
 
   async function refreshAll(): Promise<void> {
@@ -98,25 +114,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     const multiRoot = (vscode.workspace.workspaceFolders?.length || 0) > 1;
     statusBar.update(state.resolved, multiRoot ? state.folder.name : undefined);
-  }
-
-  async function checkMismatch(state: FolderState): Promise<void> {
-    if (!state.resolved || state.resolved.source === 'manual-override') { return; }
-
-    const warnOnMismatch = vscode.workspace.getConfiguration('gitSwitcher').get<boolean>('warnOnMismatch', true);
-    if (!warnOnMismatch) { return; }
-
-    const current = await configWriter.getCurrentRepoIdentity(state.git);
-    if (current.email && current.email !== state.resolved.profile.email) {
-      const action = await vscode.window.showWarningMessage(
-        `Git identity mismatch in "${state.folder.name}": repo has "${current.email}" but expected "${state.resolved.profile.email}" (${state.resolved.profile.name}).`,
-        'Switch to Expected',
-        'Keep Current',
-      );
-      if (action === 'Switch to Expected') {
-        await configWriter.applyProfile(state.resolved.profile, state.git);
-      }
-    }
   }
 
   // --- Commands ---
@@ -255,9 +252,11 @@ export function activate(context: vscode.ExtensionContext) {
   const onboarded = context.globalState.get<boolean>(ONBOARDED_KEY, false);
   if (!onboarded && profileManager.getProfiles().length === 0) {
     const onboarding = new Onboarding(profileManager);
-    onboarding.run().then(() => {
-      context.globalState.update(ONBOARDED_KEY, true);
-      refreshAll();
+    onboarding.run().then((completed) => {
+      if (completed) {
+        context.globalState.update(ONBOARDED_KEY, true);
+        refreshAll();
+      }
     });
   }
 }

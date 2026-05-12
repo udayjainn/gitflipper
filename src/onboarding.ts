@@ -15,13 +15,14 @@ interface IncludeIfEntry {
 export class Onboarding {
   constructor(private profileManager: ProfileManager) {}
 
-  async run(): Promise<void> {
+  /** Returns true if the user completed onboarding, false if dismissed. */
+  async run(): Promise<boolean> {
     const entries = this.parseIncludeIfs();
 
     if (entries.length > 0) {
-      await this.offerImport(entries);
+      return await this.offerImport(entries);
     } else {
-      await this.offerCreateProfile();
+      return await this.offerCreateProfile();
     }
   }
 
@@ -55,11 +56,10 @@ export class Onboarding {
     return entries;
   }
 
-  private async offerImport(entries: IncludeIfEntry[]): Promise<void> {
+  private async offerImport(entries: IncludeIfEntry[]): Promise<boolean> {
     const validEntries = entries.filter(e => e.email && e.userName);
     if (validEntries.length === 0) {
-      await this.offerCreateProfile();
-      return;
+      return await this.offerCreateProfile();
     }
 
     const labels = validEntries
@@ -72,18 +72,24 @@ export class Onboarding {
       'Skip',
     );
 
-    if (action !== 'Import All') {
-      if (action === 'Skip') {
-        await this.offerCreateProfile();
-      }
-      return;
+    if (!action) { return false; }
+
+    if (action === 'Skip') {
+      return await this.offerCreateProfile();
     }
 
+    const usedNames = new Set<string>();
     let imported = 0;
+
     for (const entry of validEntries) {
-      const suggestedName = this.suggestName(entry);
+      let name = this.suggestName(entry);
+      while (usedNames.has(name)) {
+        name = `${name} (${entry.email})`;
+      }
+      usedNames.add(name);
+
       const profile: GitProfile = {
-        name: suggestedName,
+        name,
         email: entry.email!,
         userName: entry.userName!,
         directories: [this.expandHome(entry.condition)],
@@ -94,11 +100,12 @@ export class Onboarding {
     }
 
     if (imported > 0) {
-      vscode.window.showInformationMessage(`Imported ${imported} profile(s): ${validEntries.map(e => this.suggestName(e)).join(', ')}.`);
+      vscode.window.showInformationMessage(`Imported ${imported} profile(s).`);
     }
+    return true;
   }
 
-  private async offerCreateProfile(): Promise<void> {
+  private async offerCreateProfile(): Promise<boolean> {
     const action = await vscode.window.showInformationMessage(
       'Welcome to Git Switcher! No profiles configured yet. Create your first profile?',
       'Create Profile',
@@ -107,16 +114,20 @@ export class Onboarding {
 
     if (action === 'Create Profile') {
       await vscode.commands.executeCommand('gitSwitcher.createProfile');
+      return true;
     }
+
+    return action === 'Later';
   }
 
   private suggestName(entry: IncludeIfEntry): string {
     const dir = entry.condition.replace(/\/$/, '');
     const base = path.basename(dir);
-    if (base.toLowerCase().includes('work') || base.toLowerCase().includes('company')) {
+    const lower = base.toLowerCase();
+    if (lower.includes('work') || lower.includes('company') || lower.includes('flexspring')) {
       return 'Work';
     }
-    if (base.toLowerCase().includes('personal') || base.toLowerCase().includes('home')) {
+    if (lower.includes('personal') || lower.includes('home')) {
       return 'Personal';
     }
     return base.charAt(0).toUpperCase() + base.slice(1);
