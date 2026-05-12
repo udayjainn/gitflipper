@@ -158,8 +158,6 @@ export function activate(context: vscode.ExtensionContext) {
     }
   }
 
-  // --- Commands ---
-
   context.subscriptions.push(
     vscode.commands.registerCommand('gitSwitcher.showActiveProfile', async () => {
       const active = getActiveFolder();
@@ -245,7 +243,6 @@ export function activate(context: vscode.ExtensionContext) {
           await preCommitGuard.uninstall(folder.uri.fsPath);
           removed++;
         } catch {
-          // skip non-git folders
         }
       }
       vscode.window.showInformationMessage(`Removed pre-commit hooks from ${removed} folder(s).`);
@@ -276,8 +273,6 @@ export function activate(context: vscode.ExtensionContext) {
       );
     }),
 
-    // --- Event Listeners ---
-
     vscode.window.onDidChangeActiveTextEditor(() => {
       updateStatusBar();
     }),
@@ -297,7 +292,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   refreshAll();
 
-  // First-run onboarding
   const onboarded = context.globalState.get<boolean>(ONBOARDED_KEY, false);
   if (!onboarded && profileManager.getProfiles().length === 0) {
     const onboarding = new Onboarding(profileManager);

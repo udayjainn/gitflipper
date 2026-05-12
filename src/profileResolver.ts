@@ -63,7 +63,6 @@ export class ProfileResolver {
         return profiles.find(p => p.email === email.value);
       }
     } catch {
-      // no local config set
     }
     return undefined;
   }

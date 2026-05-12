@@ -51,7 +51,6 @@ export class ProfileManager {
     const existingNames = this.getProfiles().map(p => p.name);
     const detected = await detectGitIdentity();
 
-    // Step 1: Profile name
     const name = await vscode.window.showInputBox({
       title: `${WIZARD_TITLE} (Step 1 of 5)`,
       prompt: 'Give this profile a name — e.g., "Work" or "Personal"',
@@ -60,7 +59,6 @@ export class ProfileManager {
     });
     if (!name) { return undefined; }
 
-    // Step 2: Git user name
     const userName = await vscode.window.showInputBox({
       title: `${WIZARD_TITLE} (Step 2 of 5)`,
       prompt: 'The name that will appear on your Git commits',
@@ -70,7 +68,6 @@ export class ProfileManager {
     });
     if (userName === undefined) { return undefined; }
 
-    // Step 3: Git email
     const email = await vscode.window.showInputBox({
       title: `${WIZARD_TITLE} (Step 3 of 5)`,
       prompt: 'The email that will appear on your Git commits',
@@ -80,13 +77,10 @@ export class ProfileManager {
     });
     if (email === undefined) { return undefined; }
 
-    // Step 4: SSH key
     const sshKeyPath = await this.pickSshKey();
 
-    // Step 5: Directories
     const directories = await this.pickDirectories();
 
-    // Summary confirmation
     const summaryLines = [
       `Name: ${name.trim()}`,
       `Git user: ${userName.trim()} <${email.trim()}>`,
@@ -242,7 +236,6 @@ export class ProfileManager {
       return undefined;
     }
 
-    // Workspace folder selected
     if (picked.description) {
       return [picked.description];
     }
