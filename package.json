@@ -1,0 +1,123 @@
+{
+  "name": "git-switcher",
+  "displayName": "Git Switcher",
+  "description": "Automatically switch Git identities (name, email, SSH key) based on workspace directory.",
+  "version": "0.1.0",
+  "publisher": "uday-jain",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "SCM Providers"
+  ],
+  "activationEvents": [
+    "workspaceContains:.git"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "contributes": {
+    "configuration": {
+      "title": "Git Switcher",
+      "properties": {
+        "gitSwitcher.profiles": {
+          "type": "array",
+          "default": [],
+          "description": "List of Git identity profiles.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Profile display name (e.g., 'Work', 'Personal')"
+              },
+              "email": {
+                "type": "string",
+                "description": "Git user email"
+              },
+              "userName": {
+                "type": "string",
+                "description": "Git user name"
+              },
+              "sshKeyPath": {
+                "type": "string",
+                "description": "Path to SSH private key for this profile"
+              },
+              "directories": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Directories that should use this profile (longest prefix match wins)"
+              }
+            },
+            "required": [
+              "name",
+              "email",
+              "userName"
+            ]
+          }
+        },
+        "gitSwitcher.defaultProfile": {
+          "type": "string",
+          "default": "",
+          "description": "Name of the default profile when no directory rule matches."
+        },
+        "gitSwitcher.warnOnMismatch": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a warning when the active Git identity doesn't match the expected profile."
+        },
+        "gitSwitcher.autoSwitch": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically apply the matching profile when opening a workspace."
+        },
+        "gitSwitcher.sshStrategy": {
+          "type": "string",
+          "enum": [
+            "GIT_SSH_COMMAND",
+            "ssh-agent"
+          ],
+          "default": "GIT_SSH_COMMAND",
+          "description": "Strategy for SSH key switching."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "gitSwitcher.showActiveProfile",
+        "title": "Git Switcher: Show Active Profile"
+      },
+      {
+        "command": "gitSwitcher.switchProfile",
+        "title": "Git Switcher: Switch Profile"
+      },
+      {
+        "command": "gitSwitcher.editProfiles",
+        "title": "Git Switcher: Edit Profiles"
+      },
+      {
+        "command": "gitSwitcher.createProfile",
+        "title": "Git Switcher: Create Profile"
+      },
+      {
+        "command": "gitSwitcher.resetToAuto",
+        "title": "Git Switcher: Reset to Auto"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "simple-git": "^3.22.0"
+  }
+}
