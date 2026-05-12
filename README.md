@@ -15,6 +15,29 @@ Git Switcher eliminates all of this. You configure your profiles once, map them 
 
 ## Features
 
+### Getting Started Walkthrough
+
+New to Git Switcher? Run **Git Switcher: Getting Started** from the Command Palette to open an interactive 4-step walkthrough:
+
+1. **Why Git Identities Matter** — plain English explanation, no Git expertise required
+2. **Create Your First Profile** — guided wizard with auto-detection
+3. **Set Up Directory Rules** — learn how auto-switching works
+4. **Verify It Works** — check the status bar and test with a commit
+
+### Guided Profile Creation
+
+The **Create Profile** wizard walks you through 5 steps with helpful defaults:
+
+| Step | What it does |
+|------|-------------|
+| 1. Profile name | Give it a label like "Work" or "Personal" |
+| 2. Git name | Pre-filled from your global Git config |
+| 3. Git email | Pre-filled from your global Git config, validated |
+| 4. SSH key | Auto-detects keys from `~/.ssh/` — pick from a list, browse, or skip |
+| 5. Directories | Select your current workspace, browse, type a path, or skip |
+
+After all steps, you see a summary confirmation. Once created, the extension tells you what was configured and what to do next.
+
 ### Automatic Identity Switching
 
 Define directory rules per profile. When you open a workspace, Git Switcher detects which directory you're in and applies the correct Git identity to the repo's local config.
@@ -24,9 +47,20 @@ Define directory rules per profile. When you open a workspace, Git Switcher dete
 ~/personal/     -> Personal profile (you@gmail.com)
 ```
 
+### Smart Notifications
+
+Git Switcher keeps you informed without being noisy:
+
+- **Profile applied** — confirms which identity was set when you open a project
+- **SSH key active** — tells you which key is being used for terminal Git operations
+- **No profile match** — warns you with buttons to create or assign a profile
+- **Identity mismatch** — alerts when switching from a different identity
+
+Each notification shows at most once per session to avoid spam.
+
 ### Status Bar Indicator
 
-Always know which identity is active. The status bar shows:
+Always know which identity is active. Click the status bar item to switch profiles.
 
 | Icon | Meaning |
 |------|---------|
@@ -35,19 +69,35 @@ Always know which identity is active. The status bar shows:
 | :information_source: | Using default profile (no directory match) |
 | :warning: | No profile configured for this workspace |
 
+**Hover for details:** The tooltip shows your full profile info (name, email, SSH key, how it was selected) and includes clickable links to Switch Profile, Reset to Auto, and Edit Profiles.
+
 In multi-root workspaces, the status bar also shows which folder it refers to.
 
 ### Pre-Commit Identity Guard
 
-A git `pre-commit` hook is automatically installed that blocks commits when your identity doesn't match the expected profile. You'll see a clear error message:
+A git `pre-commit` hook is automatically installed that blocks commits when your identity doesn't match the expected profile:
 
 ```
-[Git Switcher] Identity mismatch!
-Expected: Your Name <you@company.com>
-Current:  yourgithub <you@gmail.com>
+========================================
+  Commit blocked by Git Switcher
+========================================
 
-Run 'Git Switcher: Switch Profile' in VS Code to fix.
-Or use --no-verify to bypass this check.
+  Your current Git identity does not match
+  the profile configured for this repository.
+
+  Expected identity:
+    Your Name <you@company.com>
+
+  Your current identity:
+    yourgithub <you@gmail.com>
+
+  How to fix this:
+    1. In VS Code, press Ctrl+Shift+P (or Cmd+Shift+P on Mac)
+    2. Type: Git Switcher: Switch Profile
+    3. Select the correct profile
+
+  To bypass this check (not recommended):
+    git commit --no-verify
 ```
 
 ### SSH Key Coordination
@@ -59,15 +109,16 @@ Each profile can specify an SSH key. When the profile activates, the extension e
 
 ### Multi-Root Workspace Support
 
-Each folder in a multi-root workspace resolves its profile independently. You can have `~/work/api` using your Work profile and `~/personal/blog` using your Personal profile, open in the same VS Code window. The status bar updates as you switch between files.
+Each folder in a multi-root workspace resolves its profile independently. You can have `~/work/api` using your Work profile and `~/personal/blog` using your Personal profile, open in the same VS Code window. The status bar and SSH key update as you switch between files.
 
 ### First-Run Onboarding
 
 On first activation, Git Switcher:
 
-1. Scans your `~/.gitconfig` for existing `includeIf` directives
-2. Offers to import them as profiles automatically
-3. If none are found, walks you through creating your first profile
+1. Shows a welcome notification with options to **Get Started** (walkthrough), **Create Profile**, or dismiss
+2. Scans your `~/.gitconfig` for existing `includeIf` directives
+3. Offers to import them as profiles automatically with a clear explanation
+4. If none are found, guides you through creating your first profile
 
 ## Installation
 
@@ -95,7 +146,7 @@ code --install-extension git-switcher-0.1.0.vsix
 
 ## Configuration
 
-All configuration lives in VS Code settings under the `gitSwitcher` namespace.
+All configuration lives in VS Code settings under the `gitSwitcher` namespace. Every setting includes rich descriptions with examples — open Settings and search for `gitSwitcher` to explore.
 
 ### Profiles
 
@@ -128,14 +179,16 @@ Add profiles in your VS Code `settings.json`:
 }
 ```
 
+Or use the **Git Switcher: Create Profile** command for a guided wizard that auto-detects your Git config and SSH keys.
+
 ### Profile Fields
 
 | Field | Required | Description |
 |-------|----------|-------------|
 | `name` | Yes | Display name for the profile (e.g., "Work", "Personal") |
-| `email` | Yes | Git user email |
-| `userName` | Yes | Git user name |
-| `sshKeyPath` | No | Path to SSH private key |
+| `email` | Yes | Git user email — this appears on every commit |
+| `userName` | Yes | Git user name — this appears on every commit |
+| `sshKeyPath` | No | Path to SSH **private** key (the file without `.pub`) |
 | `directories` | No | Array of directory paths for auto-matching |
 
 ### Settings
@@ -154,10 +207,11 @@ Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and type "Git Switcher
 
 | Command | Description |
 |---------|-------------|
+| `Git Switcher: Getting Started` | Open the interactive walkthrough (great for new users) |
+| `Git Switcher: Create Profile` | Guided 5-step wizard to create a new profile |
 | `Git Switcher: Show Active Profile` | Display the current identity, source, and matched profile |
 | `Git Switcher: Switch Profile` | Pick a profile from a quick-pick list to override the auto-detected one |
 | `Git Switcher: Edit Profiles` | Open VS Code settings filtered to `gitSwitcher.profiles` |
-| `Git Switcher: Create Profile` | Step-by-step walkthrough to create a new profile |
 | `Git Switcher: Reset to Auto` | Remove the manual override and revert to directory-based detection |
 | `Git Switcher: Remove Pre-Commit Hooks` | Remove all pre-commit hooks installed by Git Switcher |
 
@@ -172,7 +226,7 @@ When a workspace opens, Git Switcher resolves the active profile using this prio
 3. **Repo-local config** — If the repo already has a local `user.email` that matches a profile
 4. **Default profile** — The profile named in `gitSwitcher.defaultProfile`
 
-If nothing matches, the status bar shows "No Profile" with a warning indicator.
+If nothing matches, the status bar shows "No Profile" with a warning, and a notification offers to create or assign one.
 
 ### What It Modifies
 
@@ -194,14 +248,22 @@ git-switcher/
 ├── src/
 │   ├── extension.ts           # Entry point, command registration, lifecycle
 │   ├── types.ts               # GitProfile, ResolvedProfile, SshStrategy
-│   ├── profileManager.ts      # CRUD on profiles + interactive create wizard
+│   ├── validation.ts          # Shared validation, path expansion, SSH key scanning
+│   ├── notifications.ts       # Centralized user-facing messages with session dedup
+│   ├── profileManager.ts      # CRUD on profiles + guided create wizard
 │   ├── profileResolver.ts     # Resolution chain: override -> directory -> repo -> default
 │   ├── gitConfigWriter.ts     # Writes user.name/email to repo-local .git/config
 │   ├── sshKeyManager.ts       # GIT_SSH_COMMAND and ssh-agent strategies
-│   ├── statusBarController.ts # Status bar rendering with folder-aware display
-│   ├── preCommitGuard.ts      # Installs/manages pre-commit identity check hook
-│   └── onboarding.ts          # First-run includeIf import and profile wizard
-├── package.json               # Extension manifest, settings schema, commands
+│   ├── statusBarController.ts # Status bar with rich MarkdownString tooltips
+│   ├── preCommitGuard.ts      # Pre-commit identity check hook
+│   └── onboarding.ts          # First-run includeIf import and walkthrough
+├── media/
+│   └── walkthrough/           # Getting Started walkthrough content
+│       ├── understand.md
+│       ├── create-profile.md
+│       ├── directory-rules.md
+│       └── verify.md
+├── package.json               # Extension manifest, settings schema, walkthroughs
 └── tsconfig.json
 ```
 
@@ -234,7 +296,7 @@ Host github.com
   IdentityFile ~/.ssh/id_personal
 ```
 
-**3. Add profiles in VS Code settings:**
+**3. Add profiles in VS Code settings (or use the Create Profile wizard):**
 
 ```jsonc
 {
