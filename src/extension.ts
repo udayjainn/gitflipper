@@ -62,11 +62,19 @@ export function activate(context: vscode.ExtensionContext) {
     state.resolved = await resolver.resolve(state.folder.uri.fsPath, state.git, override);
 
     if (!state.resolved) {
-      showNoProfileMatch(state.folder.name);
+      if (profileManager.getProfiles().length > 0) {
+        showNoProfileMatch(state.folder.name);
+      }
       return;
     }
 
     const autoSwitch = vscode.workspace.getConfiguration('gitSwitcher').get<boolean>('autoSwitch', true);
+
+    if (state.resolved.profile.sshKeyPath) {
+      await sshManager.applyKey(state.resolved.profile.sshKeyPath);
+      lastAppliedSshKey = state.resolved.profile.sshKeyPath;
+      showSshKeyApplied(state.resolved.profile.sshKeyPath);
+    }
 
     if (autoSwitch) {
       const current = await configWriter.getCurrentRepoIdentity(state.git);
@@ -75,13 +83,6 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       await configWriter.applyProfile(state.resolved.profile, state.git);
-
-      if (state.resolved.profile.sshKeyPath) {
-        await sshManager.applyKey(state.resolved.profile.sshKeyPath);
-        lastAppliedSshKey = state.resolved.profile.sshKeyPath;
-        showSshKeyApplied(state.resolved.profile.sshKeyPath);
-      }
-
       await preCommitGuard.install(state.folder.uri.fsPath, state.resolved.profile);
 
       const activeFolder = getActiveFolder();
