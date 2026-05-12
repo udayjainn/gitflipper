@@ -30,10 +30,10 @@ Always know which identity is active. The status bar shows:
 
 | Icon | Meaning |
 |------|---------|
-| $(check) | Profile auto-detected from directory rules |
-| $(pencil) | Manual override is active |
-| $(info) | Using default profile (no directory match) |
-| $(alert) | No profile configured for this workspace |
+| :white_check_mark: | Profile auto-detected from directory rules |
+| :pencil2: | Manual override is active |
+| :information_source: | Using default profile (no directory match) |
+| :warning: | No profile configured for this workspace |
 
 In multi-root workspaces, the status bar also shows which folder it refers to.
 
@@ -43,8 +43,8 @@ A git `pre-commit` hook is automatically installed that blocks commits when your
 
 ```
 [Git Switcher] Identity mismatch!
-Expected: Uday Jain <uday.jain@flexspring.com>
-Current:  udayjainn <udayjain00@gmail.com>
+Expected: Your Name <you@company.com>
+Current:  yourgithub <you@gmail.com>
 
 Run 'Git Switcher: Switch Profile' in VS Code to fix.
 Or use --no-verify to bypass this check.
