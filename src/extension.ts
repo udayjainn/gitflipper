@@ -6,7 +6,10 @@ import { GitConfigWriter } from './gitConfigWriter';
 import { SshKeyManager } from './sshKeyManager';
 import { StatusBarController } from './statusBarController';
 import { PreCommitGuard } from './preCommitGuard';
+import { Onboarding } from './onboarding';
 import { ResolvedProfile } from './types';
+
+const ONBOARDED_KEY = 'gitSwitcher.onboarded';
 
 const OVERRIDE_KEY = 'gitSwitcher.manualOverride';
 
@@ -196,6 +199,20 @@ export function activate(context: vscode.ExtensionContext) {
       }
     }),
 
+    vscode.commands.registerCommand('gitSwitcher.removeHooks', async () => {
+      const folders = vscode.workspace.workspaceFolders || [];
+      let removed = 0;
+      for (const folder of folders) {
+        try {
+          await preCommitGuard.uninstall(folder.uri.fsPath);
+          removed++;
+        } catch {
+          // skip non-git folders
+        }
+      }
+      vscode.window.showInformationMessage(`Removed pre-commit hooks from ${removed} folder(s).`);
+    }),
+
     vscode.commands.registerCommand('gitSwitcher.resetToAuto', async () => {
       const active = getActiveFolder();
       if (!active) { return; }
@@ -233,6 +250,16 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   refreshAll();
+
+  // First-run onboarding
+  const onboarded = context.globalState.get<boolean>(ONBOARDED_KEY, false);
+  if (!onboarded && profileManager.getProfiles().length === 0) {
+    const onboarding = new Onboarding(profileManager);
+    onboarding.run().then(() => {
+      context.globalState.update(ONBOARDED_KEY, true);
+      refreshAll();
+    });
+  }
 }
 
 export function deactivate() {

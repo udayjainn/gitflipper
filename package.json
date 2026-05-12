@@ -109,6 +109,10 @@
       {
         "command": "gitSwitcher.resetToAuto",
         "title": "Git Switcher: Reset to Auto"
+      },
+      {
+        "command": "gitSwitcher.removeHooks",
+        "title": "Git Switcher: Remove Pre-Commit Hooks"
       }
     ]
   },
