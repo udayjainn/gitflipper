@@ -17,6 +17,10 @@ interface IncludeIfEntry {
 export class Onboarding {
   constructor(private profileManager: ProfileManager) {}
 
+  hasIncludeIfs(): boolean {
+    return this.parseIncludeIfs().length > 0;
+  }
+
   async run(): Promise<boolean> {
     const entries = this.parseIncludeIfs();
 

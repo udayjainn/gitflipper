@@ -19,6 +19,10 @@ function buildHookScript(): string {
     'CURRENT_EMAIL=$(git config user.email)',
     'CURRENT_NAME=$(git config user.name)',
     '',
+    'if [ -z "$EXPECTED_EMAIL" ]; then',
+    '  exit 0',
+    'fi',
+    '',
     'if [ "$CURRENT_EMAIL" != "$EXPECTED_EMAIL" ]; then',
     '  echo ""',
     '  echo "========================================"',
@@ -100,7 +104,7 @@ export class PreCommitGuard {
     const hookPath = path.join(gitDir, 'hooks', 'pre-commit');
     if (!fs.existsSync(hookPath)) { return; }
 
-    const content = fs.readFileSync(hookPath, 'utf-8');
+    const content = fs.readFileSync(hookPath, 'utf-8').replace(/\r\n/g, '\n');
     if (!content.includes(HOOK_MARKER)) { return; }
 
     const markerStart = content.indexOf(HOOK_MARKER);

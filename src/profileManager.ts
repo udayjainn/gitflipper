@@ -97,7 +97,7 @@ export class ProfileManager {
     }
 
     const confirm = await vscode.window.showInformationMessage(
-      `Create profile "${name.trim()}"?\n\n${summaryLines.join(' | ')}`,
+      `Create profile "${name.trim()}"?\n\n${summaryLines.join('\n')}`,
       { modal: true },
       'Create',
     );

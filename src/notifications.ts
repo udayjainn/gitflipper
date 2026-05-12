@@ -44,7 +44,7 @@ export async function showNoProfileMatch(folderName: string): Promise<void> {
 
 export async function showFirstRunWelcome(): Promise<string | undefined> {
   return vscode.window.showInformationMessage(
-    'Welcome to Git Switcher! Set up profiles to automatically switch your Git identity (name, email, SSH key) based on which folder you\'re working in.',
+    'Welcome to Git Switcher! Automatically switch your Git identity based on project folder.',
     'Get Started',
     'Create Profile',
     'Later',

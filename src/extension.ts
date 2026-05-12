@@ -37,6 +37,9 @@ export function activate(context: vscode.ExtensionContext) {
   sshManager.setEnvCollection(context.environmentVariableCollection);
 
   const folderStates = new Map<string, FolderState>();
+  let refreshing = false;
+  let refreshQueued = false;
+  let lastAppliedSshKey: string | undefined;
 
   function getActiveFolder(): vscode.WorkspaceFolder | undefined {
     const editor = vscode.window.activeTextEditor;
@@ -68,23 +71,27 @@ export function activate(context: vscode.ExtensionContext) {
     if (autoSwitch) {
       const current = await configWriter.getCurrentRepoIdentity(state.git);
       if (current.email && current.email !== state.resolved.profile.email) {
-        await showMismatchWarning(state, current.email);
+        showMismatchWarning(state, current.email);
       }
 
       await configWriter.applyProfile(state.resolved.profile, state.git);
 
       if (state.resolved.profile.sshKeyPath) {
         await sshManager.applyKey(state.resolved.profile.sshKeyPath);
+        lastAppliedSshKey = state.resolved.profile.sshKeyPath;
         showSshKeyApplied(state.resolved.profile.sshKeyPath);
       }
 
       await preCommitGuard.install(state.folder.uri.fsPath, state.resolved.profile);
 
-      showProfileApplied(state.resolved.profile, state.folder.name);
+      const activeFolder = getActiveFolder();
+      if (state.folder.uri.fsPath === activeFolder?.uri.fsPath) {
+        showProfileApplied(state.resolved.profile, state.folder.name);
+      }
     }
   }
 
-  async function showMismatchWarning(state: FolderState, currentEmail: string): Promise<void> {
+  function showMismatchWarning(state: FolderState, currentEmail: string): void {
     if (!state.resolved || state.resolved.source === 'manual-override') { return; }
 
     const warnOnMismatch = vscode.workspace.getConfiguration('gitSwitcher').get<boolean>('warnOnMismatch', true);
@@ -96,18 +103,32 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   async function refreshAll(): Promise<void> {
-    folderStates.clear();
-    const folders = vscode.workspace.workspaceFolders || [];
+    if (refreshing) {
+      refreshQueued = true;
+      return;
+    }
+    refreshing = true;
 
-    for (const folder of folders) {
-      const state = await initFolder(folder);
-      if (state) {
-        folderStates.set(folder.uri.fsPath, state);
-        await resolveAndApplyFolder(state);
+    try {
+      folderStates.clear();
+      const folders = vscode.workspace.workspaceFolders || [];
+
+      for (const folder of folders) {
+        const state = await initFolder(folder);
+        if (state) {
+          folderStates.set(folder.uri.fsPath, state);
+          await resolveAndApplyFolder(state);
+        }
+      }
+
+      updateStatusBar();
+    } finally {
+      refreshing = false;
+      if (refreshQueued) {
+        refreshQueued = false;
+        await refreshAll();
       }
     }
-
-    updateStatusBar();
   }
 
   function updateStatusBar(): void {
@@ -126,10 +147,13 @@ export function activate(context: vscode.ExtensionContext) {
     const multiRoot = (vscode.workspace.workspaceFolders?.length || 0) > 1;
     statusBar.update(state.resolved, multiRoot ? state.folder.name : undefined);
 
-    if (state.resolved?.profile.sshKeyPath) {
-      sshManager.applyKey(state.resolved.profile.sshKeyPath);
-    } else {
+    const newKey = state.resolved?.profile.sshKeyPath;
+    if (newKey && newKey !== lastAppliedSshKey) {
+      sshManager.applyKey(newKey);
+      lastAppliedSshKey = newKey;
+    } else if (!newKey && lastAppliedSshKey) {
       sshManager.clearEnv();
+      lastAppliedSshKey = undefined;
     }
   }
 
@@ -275,25 +299,29 @@ export function activate(context: vscode.ExtensionContext) {
   // First-run onboarding
   const onboarded = context.globalState.get<boolean>(ONBOARDED_KEY, false);
   if (!onboarded && profileManager.getProfiles().length === 0) {
-    showFirstRunWelcome().then(async (action) => {
-      if (action === 'Get Started') {
-        vscode.commands.executeCommand('gitSwitcher.openWalkthrough');
-        context.globalState.update(ONBOARDED_KEY, true);
-      } else if (action === 'Create Profile') {
-        await vscode.commands.executeCommand('gitSwitcher.createProfile');
-        context.globalState.update(ONBOARDED_KEY, true);
-      } else if (action === 'Later') {
-        // Don't mark onboarded — show again next time
-      } else {
-        // Also try existing includeIf import
-        const onboarding = new Onboarding(profileManager);
-        const completed = await onboarding.run();
+    const onboarding = new Onboarding(profileManager);
+    const entries = onboarding.hasIncludeIfs();
+
+    if (entries) {
+      onboarding.run().then((completed) => {
         if (completed) {
           context.globalState.update(ONBOARDED_KEY, true);
           refreshAll();
         }
-      }
-    });
+      });
+    } else {
+      showFirstRunWelcome().then(async (action) => {
+        if (action === 'Get Started') {
+          await vscode.commands.executeCommand('gitSwitcher.openWalkthrough');
+          context.globalState.update(ONBOARDED_KEY, true);
+        } else if (action === 'Create Profile') {
+          await vscode.commands.executeCommand('gitSwitcher.createProfile');
+          if (profileManager.getProfiles().length > 0) {
+            context.globalState.update(ONBOARDED_KEY, true);
+          }
+        }
+      });
+    }
   }
 }
 

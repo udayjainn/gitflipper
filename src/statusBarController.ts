@@ -54,14 +54,14 @@ export class StatusBarController {
     md.isTrusted = true;
 
     md.appendMarkdown(`**Git Switcher — ${name}**\n\n`);
-    md.appendMarkdown(`| | |\n|---|---|\n`);
-    md.appendMarkdown(`| Name | ${userName} |\n`);
-    md.appendMarkdown(`| Email | ${email} |\n`);
+    md.appendMarkdown(`| Property | Value |\n|---|---|\n`);
+    md.appendMarkdown(`| **Name** | ${userName} |\n`);
+    md.appendMarkdown(`| **Email** | ${email} |\n`);
     if (sshKey) {
       const shortKey = sshKey.replace(/^.*[/\\]/, '');
-      md.appendMarkdown(`| SSH Key | ${shortKey} |\n`);
+      md.appendMarkdown(`| **SSH Key** | ${shortKey} |\n`);
     }
-    md.appendMarkdown(`| Source | ${SOURCE_LABELS[source] || source} |\n`);
+    md.appendMarkdown(`| **Source** | ${SOURCE_LABELS[source] || source} |\n`);
     md.appendMarkdown(`\n---\n`);
     md.appendMarkdown(`[Switch Profile](command:gitSwitcher.switchProfile) · `);
     md.appendMarkdown(`[Reset to Auto](command:gitSwitcher.resetToAuto) · `);
