@@ -1,6 +1,6 @@
 ## Set Up Directory Rules
 
-Directory rules are what make Git Switcher automatic. You map folders to profiles, and the extension handles the rest.
+Directory rules are what make GitFlip automatic. You map folders to profiles, and the extension handles the rest.
 
 **Example setup:**
 
@@ -14,7 +14,7 @@ Any project opened under `~/work/` will automatically use your Work identity. An
 **How to add directory rules:**
 
 - During profile creation (Step 5 of the wizard)
-- Or in Settings: search for `gitSwitcher.profiles` and edit the `directories` array
+- Or in Settings: search for `gitFlip.profiles` and edit the `directories` array
 
 **Tips:**
 - Use parent directories — `~/work/` will match `~/work/project-a/`, `~/work/project-b/`, etc.

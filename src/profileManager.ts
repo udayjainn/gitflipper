@@ -14,11 +14,11 @@ const WIZARD_TITLE = 'Create Git Profile';
 
 export class ProfileManager {
   getProfiles(): GitProfile[] {
-    return vscode.workspace.getConfiguration('gitSwitcher').get<GitProfile[]>('profiles', []);
+    return vscode.workspace.getConfiguration('gitFlip').get<GitProfile[]>('profiles', []);
   }
 
   getDefaultProfileName(): string {
-    return vscode.workspace.getConfiguration('gitSwitcher').get<string>('defaultProfile', '');
+    return vscode.workspace.getConfiguration('gitFlip').get<string>('defaultProfile', '');
   }
 
   getDefaultProfile(): GitProfile | undefined {
@@ -39,12 +39,12 @@ export class ProfileManager {
     } else {
       profiles.push(profile);
     }
-    await vscode.workspace.getConfiguration('gitSwitcher').update('profiles', profiles, vscode.ConfigurationTarget.Global);
+    await vscode.workspace.getConfiguration('gitFlip').update('profiles', profiles, vscode.ConfigurationTarget.Global);
   }
 
   async removeProfile(name: string): Promise<void> {
     const profiles = this.getProfiles().filter(p => p.name !== name);
-    await vscode.workspace.getConfiguration('gitSwitcher').update('profiles', profiles, vscode.ConfigurationTarget.Global);
+    await vscode.workspace.getConfiguration('gitFlip').update('profiles', profiles, vscode.ConfigurationTarget.Global);
   }
 
   async createProfileInteractive(): Promise<GitProfile | undefined> {
@@ -109,7 +109,7 @@ export class ProfileManager {
 
     const hasDir = profile.directories && profile.directories.length > 0;
     const nextSteps = hasDir
-      ? `Git Switcher will auto-apply this identity when you open projects in ${profile.directories!.join(', ')}.`
+      ? `GitFlip will auto-apply this identity when you open projects in ${profile.directories!.join(', ')}.`
       : 'Tip: Add directory rules in settings so this profile activates automatically for certain folders.';
 
     vscode.window.showInformationMessage(
@@ -117,7 +117,7 @@ export class ProfileManager {
       'Edit in Settings',
     ).then(action => {
       if (action === 'Edit in Settings') {
-        vscode.commands.executeCommand('workbench.action.openSettings', 'gitSwitcher.profiles');
+        vscode.commands.executeCommand('workbench.action.openSettings', 'gitFlip.profiles');
       }
     });
 

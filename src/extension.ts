@@ -15,8 +15,8 @@ import {
   showFirstRunWelcome,
 } from './notifications';
 
-const ONBOARDED_KEY = 'gitSwitcher.onboarded';
-const OVERRIDE_KEY = 'gitSwitcher.manualOverride';
+const ONBOARDED_KEY = 'gitFlip.onboarded';
+const OVERRIDE_KEY = 'gitFlip.manualOverride';
 
 let statusBar: StatusBarController;
 
@@ -68,7 +68,7 @@ export function activate(context: vscode.ExtensionContext) {
       return;
     }
 
-    const autoSwitch = vscode.workspace.getConfiguration('gitSwitcher').get<boolean>('autoSwitch', true);
+    const autoSwitch = vscode.workspace.getConfiguration('gitFlip').get<boolean>('autoSwitch', true);
 
     if (state.resolved.profile.sshKeyPath) {
       await sshManager.applyKey(state.resolved.profile.sshKeyPath);
@@ -95,11 +95,11 @@ export function activate(context: vscode.ExtensionContext) {
   function showMismatchWarning(state: FolderState, currentEmail: string): void {
     if (!state.resolved || state.resolved.source === 'manual-override') { return; }
 
-    const warnOnMismatch = vscode.workspace.getConfiguration('gitSwitcher').get<boolean>('warnOnMismatch', true);
+    const warnOnMismatch = vscode.workspace.getConfiguration('gitFlip').get<boolean>('warnOnMismatch', true);
     if (!warnOnMismatch) { return; }
 
     vscode.window.showWarningMessage(
-      `Git Switcher: Switching identity in "${state.folder.name}" from "${currentEmail}" to "${state.resolved.profile.email}" (${state.resolved.profile.name}).`
+      `GitFlip: Switching identity in "${state.folder.name}" from "${currentEmail}" to "${state.resolved.profile.email}" (${state.resolved.profile.name}).`
     );
   }
 
@@ -159,7 +159,7 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('gitSwitcher.showActiveProfile', async () => {
+    vscode.commands.registerCommand('gitFlip.showActiveProfile', async () => {
       const active = getActiveFolder();
       if (!active) {
         vscode.window.showInformationMessage('No workspace open. Open a folder first (File > Open Folder).');
@@ -176,12 +176,12 @@ export function activate(context: vscode.ExtensionContext) {
         const git = simpleGit(active.uri.fsPath);
         const current = await configWriter.getCurrentRepoIdentity(git);
         vscode.window.showInformationMessage(
-          `No profile matched for "${active.name}". Current repo identity: ${current.name || 'unset'} <${current.email || 'unset'}>. Use "Git Switcher: Create Profile" to set one up.`
+          `No profile matched for "${active.name}". Current repo identity: ${current.name || 'unset'} <${current.email || 'unset'}>. Use "GitFlip: Create Profile" to set one up.`
         );
       }
     }),
 
-    vscode.commands.registerCommand('gitSwitcher.switchProfile', async () => {
+    vscode.commands.registerCommand('gitFlip.switchProfile', async () => {
       const profiles = profileManager.getProfiles();
       if (profiles.length === 0) {
         const create = await vscode.window.showWarningMessage(
@@ -189,7 +189,7 @@ export function activate(context: vscode.ExtensionContext) {
           'Create Profile',
         );
         if (create) {
-          await vscode.commands.executeCommand('gitSwitcher.createProfile');
+          await vscode.commands.executeCommand('gitFlip.createProfile');
         }
         return;
       }
@@ -224,18 +224,18 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.window.showInformationMessage(`Switched "${active.name}" to profile: ${picked.label}`);
     }),
 
-    vscode.commands.registerCommand('gitSwitcher.editProfiles', async () => {
-      await vscode.commands.executeCommand('workbench.action.openSettings', 'gitSwitcher.profiles');
+    vscode.commands.registerCommand('gitFlip.editProfiles', async () => {
+      await vscode.commands.executeCommand('workbench.action.openSettings', 'gitFlip.profiles');
     }),
 
-    vscode.commands.registerCommand('gitSwitcher.createProfile', async () => {
+    vscode.commands.registerCommand('gitFlip.createProfile', async () => {
       const profile = await profileManager.createProfileInteractive();
       if (profile) {
         await refreshAll();
       }
     }),
 
-    vscode.commands.registerCommand('gitSwitcher.removeHooks', async () => {
+    vscode.commands.registerCommand('gitFlip.removeHooks', async () => {
       const folders = vscode.workspace.workspaceFolders || [];
       let removed = 0;
       for (const folder of folders) {
@@ -248,7 +248,7 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.window.showInformationMessage(`Removed pre-commit hooks from ${removed} folder(s).`);
     }),
 
-    vscode.commands.registerCommand('gitSwitcher.resetToAuto', async () => {
+    vscode.commands.registerCommand('gitFlip.resetToAuto', async () => {
       const active = getActiveFolder();
       if (!active) { return; }
 
@@ -265,10 +265,10 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.window.showInformationMessage(`Reset "${active.name}" to automatic profile detection.`);
     }),
 
-    vscode.commands.registerCommand('gitSwitcher.openWalkthrough', () => {
+    vscode.commands.registerCommand('gitFlip.openWalkthrough', () => {
       vscode.commands.executeCommand(
         'workbench.action.openWalkthrough',
-        'uday-jain.git-switcher#gitSwitcher.gettingStarted',
+        'uday-jain.gitflip#gitFlip.gettingStarted',
         false,
       );
     }),
@@ -278,7 +278,7 @@ export function activate(context: vscode.ExtensionContext) {
     }),
 
     vscode.workspace.onDidChangeConfiguration(e => {
-      if (e.affectsConfiguration('gitSwitcher')) {
+      if (e.affectsConfiguration('gitFlip')) {
         refreshAll();
       }
     }),
@@ -307,10 +307,10 @@ export function activate(context: vscode.ExtensionContext) {
     } else {
       showFirstRunWelcome().then(async (action) => {
         if (action === 'Get Started') {
-          await vscode.commands.executeCommand('gitSwitcher.openWalkthrough');
+          await vscode.commands.executeCommand('gitFlip.openWalkthrough');
           context.globalState.update(ONBOARDED_KEY, true);
         } else if (action === 'Create Profile') {
-          await vscode.commands.executeCommand('gitSwitcher.createProfile');
+          await vscode.commands.executeCommand('gitFlip.createProfile');
           if (profileManager.getProfiles().length > 0) {
             context.globalState.update(ONBOARDED_KEY, true);
           }

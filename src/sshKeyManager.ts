@@ -15,7 +15,7 @@ export class SshKeyManager {
 
   async applyKey(keyPath: string): Promise<void> {
     const strategy = vscode.workspace
-      .getConfiguration('gitSwitcher')
+      .getConfiguration('gitFlip')
       .get<SshStrategy>('sshStrategy', 'GIT_SSH_COMMAND');
 
     if (strategy === 'GIT_SSH_COMMAND') {

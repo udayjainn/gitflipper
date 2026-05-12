@@ -21,6 +21,6 @@ The icon tells you how the profile was selected:
 3. Run `git log --format="%an <%ae>" -1` in the terminal to verify the name and email
 
 **Quick commands:**
-- `Git Switcher: Show Active Profile` — see full details about the current identity
-- `Git Switcher: Switch Profile` — manually override the auto-detected profile
-- `Git Switcher: Reset to Auto` — go back to automatic detection
+- `GitFlip: Show Active Profile` — see full details about the current identity
+- `GitFlip: Switch Profile` — manually override the auto-detected profile
+- `GitFlip: Reset to Auto` — go back to automatic detection

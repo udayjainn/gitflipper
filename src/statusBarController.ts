@@ -13,7 +13,7 @@ export class StatusBarController {
 
   constructor() {
     this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-    this.item.command = 'gitSwitcher.switchProfile';
+    this.item.command = 'gitFlip.switchProfile';
   }
 
   update(resolved: ResolvedProfile | undefined, folderName?: string): void {
@@ -53,7 +53,7 @@ export class StatusBarController {
     const md = new vscode.MarkdownString('', true);
     md.isTrusted = true;
 
-    md.appendMarkdown(`**Git Switcher — ${name}**\n\n`);
+    md.appendMarkdown(`**GitFlip — ${name}**\n\n`);
     md.appendMarkdown(`| Property | Value |\n|---|---|\n`);
     md.appendMarkdown(`| **Name** | ${userName} |\n`);
     md.appendMarkdown(`| **Email** | ${email} |\n`);
@@ -63,9 +63,9 @@ export class StatusBarController {
     }
     md.appendMarkdown(`| **Source** | ${SOURCE_LABELS[source] || source} |\n`);
     md.appendMarkdown(`\n---\n`);
-    md.appendMarkdown(`[Switch Profile](command:gitSwitcher.switchProfile) · `);
-    md.appendMarkdown(`[Reset to Auto](command:gitSwitcher.resetToAuto) · `);
-    md.appendMarkdown(`[Edit Profiles](command:gitSwitcher.editProfiles)`);
+    md.appendMarkdown(`[Switch Profile](command:gitFlip.switchProfile) · `);
+    md.appendMarkdown(`[Reset to Auto](command:gitFlip.resetToAuto) · `);
+    md.appendMarkdown(`[Edit Profiles](command:gitFlip.editProfiles)`);
 
     return md;
   }
@@ -75,12 +75,12 @@ export class StatusBarController {
     md.isTrusted = true;
 
     const folder = folderName ? ` for "${folderName}"` : '';
-    md.appendMarkdown(`**Git Switcher — No Profile${folder}**\n\n`);
+    md.appendMarkdown(`**GitFlip — No Profile${folder}**\n\n`);
     md.appendMarkdown(`No profile is configured for this workspace. `);
     md.appendMarkdown(`Commits will use whatever identity is in your Git config.\n\n`);
     md.appendMarkdown(`---\n`);
-    md.appendMarkdown(`[Create Profile](command:gitSwitcher.createProfile) · `);
-    md.appendMarkdown(`[Assign Profile](command:gitSwitcher.switchProfile)`);
+    md.appendMarkdown(`[Create Profile](command:gitFlip.createProfile) · `);
+    md.appendMarkdown(`[Assign Profile](command:gitFlip.switchProfile)`);
 
     return md;
   }

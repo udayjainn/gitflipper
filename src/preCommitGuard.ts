@@ -2,8 +2,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { GitProfile } from './types';
 
-const HOOK_MARKER = '# git-switcher-pre-commit-guard';
-const EXPECTED_FILE = 'git-switcher-expected';
+const HOOK_MARKER = '# gitflip-pre-commit-guard';
+const EXPECTED_FILE = 'gitflip-expected';
 
 function buildHookScript(): string {
   return [
@@ -26,7 +26,7 @@ function buildHookScript(): string {
     'if [ "$CURRENT_EMAIL" != "$EXPECTED_EMAIL" ]; then',
     '  echo ""',
     '  echo "========================================"',
-    '  echo "  Commit blocked by Git Switcher"',
+    '  echo "  Commit blocked by GitFlip"',
     '  echo "========================================"',
     '  echo ""',
     '  echo "  Your current Git identity does not match"',
@@ -40,7 +40,7 @@ function buildHookScript(): string {
     '  echo ""',
     '  echo "  How to fix this:"',
     '  echo "    1. In VS Code, press Ctrl+Shift+P (or Cmd+Shift+P on Mac)"',
-    '  echo "    2. Type: Git Switcher: Switch Profile"',
+    '  echo "    2. Type: GitFlip: Switch Profile"',
     '  echo "    3. Select the correct profile"',
     '  echo ""',
     '  echo "  To bypass this check (not recommended):"',

@@ -1,4 +1,4 @@
-# Git Switcher
+# GitFlip
 
 A VS Code extension that automatically switches your Git identity (name, email, SSH key) based on your workspace directory. Stop committing to your work repo with your personal email, or vice versa.
 
@@ -11,13 +11,13 @@ If you use one machine for both work and personal projects, you've probably:
 - Manually edited `.gitconfig` every time you switched contexts
 - Had your personal email show up in your company's commit history
 
-Git Switcher eliminates all of this. You configure your profiles once, map them to directories, and the extension handles the rest automatically.
+GitFlip eliminates all of this. You configure your profiles once, map them to directories, and the extension handles the rest automatically.
 
 ## Features
 
 ### Getting Started Walkthrough
 
-New to Git Switcher? Run **Git Switcher: Getting Started** from the Command Palette to open an interactive 4-step walkthrough:
+New to GitFlip? Run **GitFlip: Getting Started** from the Command Palette to open an interactive 4-step walkthrough:
 
 1. **Why Git Identities Matter** — plain English explanation, no Git expertise required
 2. **Create Your First Profile** — guided wizard with auto-detection
@@ -40,7 +40,7 @@ After all steps, you see a summary confirmation. Once created, the extension tel
 
 ### Automatic Identity Switching
 
-Define directory rules per profile. When you open a workspace, Git Switcher detects which directory you're in and applies the correct Git identity to the repo's local config.
+Define directory rules per profile. When you open a workspace, GitFlip detects which directory you're in and applies the correct Git identity to the repo's local config.
 
 ```
 ~/work/         -> Work profile  (you@company.com)
@@ -49,7 +49,7 @@ Define directory rules per profile. When you open a workspace, Git Switcher dete
 
 ### Smart Notifications
 
-Git Switcher keeps you informed without being noisy:
+GitFlip keeps you informed without being noisy:
 
 - **Profile applied** — confirms which identity was set when you open a project
 - **SSH key active** — tells you which key is being used for terminal Git operations
@@ -79,7 +79,7 @@ A git `pre-commit` hook is automatically installed that blocks commits when your
 
 ```
 ========================================
-  Commit blocked by Git Switcher
+  Commit blocked by GitFlip
 ========================================
 
   Your current Git identity does not match
@@ -93,7 +93,7 @@ A git `pre-commit` hook is automatically installed that blocks commits when your
 
   How to fix this:
     1. In VS Code, press Ctrl+Shift+P (or Cmd+Shift+P on Mac)
-    2. Type: Git Switcher: Switch Profile
+    2. Type: GitFlip: Switch Profile
     3. Select the correct profile
 
   To bypass this check (not recommended):
@@ -113,7 +113,7 @@ Each folder in a multi-root workspace resolves its profile independently. You ca
 
 ### First-Run Onboarding
 
-On first activation, Git Switcher:
+On first activation, GitFlip:
 
 1. Shows a welcome notification with options to **Get Started** (walkthrough), **Create Profile**, or dismiss
 2. Scans your `~/.gitconfig` for existing `includeIf` directives
@@ -125,8 +125,8 @@ On first activation, Git Switcher:
 ### From Source
 
 ```bash
-git clone https://github.com/udayjainn/git-switcher.git
-cd git-switcher
+git clone https://github.com/udayjainn/gitflip.git
+cd gitflip
 npm install
 npm run compile
 ```
@@ -134,19 +134,19 @@ npm run compile
 Then in VS Code, press `F5` to launch the Extension Development Host, or run:
 
 ```bash
-code --extensionDevelopmentPath=/path/to/git-switcher
+code --extensionDevelopmentPath=/path/to/gitflip
 ```
 
 ### Package as VSIX
 
 ```bash
 npx vsce package
-code --install-extension git-switcher-0.1.0.vsix
+code --install-extension gitflip-0.1.0.vsix
 ```
 
 ## Configuration
 
-All configuration lives in VS Code settings under the `gitSwitcher` namespace. Every setting includes rich descriptions with examples — open Settings and search for `gitSwitcher` to explore.
+All configuration lives in VS Code settings under the `gitFlip` namespace. Every setting includes rich descriptions with examples — open Settings and search for `gitFlip` to explore.
 
 ### Profiles
 
@@ -154,7 +154,7 @@ Add profiles in your VS Code `settings.json`:
 
 ```jsonc
 {
-  "gitSwitcher.profiles": [
+  "gitFlip.profiles": [
     {
       "name": "Work",
       "email": "you@company.com",
@@ -179,7 +179,7 @@ Add profiles in your VS Code `settings.json`:
 }
 ```
 
-Or use the **Git Switcher: Create Profile** command for a guided wizard that auto-detects your Git config and SSH keys.
+Or use the **GitFlip: Create Profile** command for a guided wizard that auto-detects your Git config and SSH keys.
 
 ### Profile Fields
 
@@ -195,36 +195,36 @@ Or use the **Git Switcher: Create Profile** command for a guided wizard that aut
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `gitSwitcher.profiles` | `[]` | Array of Git identity profiles |
-| `gitSwitcher.defaultProfile` | `""` | Fallback profile name when no directory rule matches |
-| `gitSwitcher.autoSwitch` | `true` | Automatically apply the matching profile on workspace open |
-| `gitSwitcher.warnOnMismatch` | `true` | Show a warning when repo identity differs from expected profile |
-| `gitSwitcher.sshStrategy` | `GIT_SSH_COMMAND` | SSH key switching strategy (`GIT_SSH_COMMAND` or `ssh-agent`) |
+| `gitFlip.profiles` | `[]` | Array of Git identity profiles |
+| `gitFlip.defaultProfile` | `""` | Fallback profile name when no directory rule matches |
+| `gitFlip.autoSwitch` | `true` | Automatically apply the matching profile on workspace open |
+| `gitFlip.warnOnMismatch` | `true` | Show a warning when repo identity differs from expected profile |
+| `gitFlip.sshStrategy` | `GIT_SSH_COMMAND` | SSH key switching strategy (`GIT_SSH_COMMAND` or `ssh-agent`) |
 
 ## Commands
 
-Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and type "Git Switcher":
+Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and type "GitFlip":
 
 | Command | Description |
 |---------|-------------|
-| `Git Switcher: Getting Started` | Open the interactive walkthrough (great for new users) |
-| `Git Switcher: Create Profile` | Guided 5-step wizard to create a new profile |
-| `Git Switcher: Show Active Profile` | Display the current identity, source, and matched profile |
-| `Git Switcher: Switch Profile` | Pick a profile from a quick-pick list to override the auto-detected one |
-| `Git Switcher: Edit Profiles` | Open VS Code settings filtered to `gitSwitcher.profiles` |
-| `Git Switcher: Reset to Auto` | Remove the manual override and revert to directory-based detection |
-| `Git Switcher: Remove Pre-Commit Hooks` | Remove all pre-commit hooks installed by Git Switcher |
+| `GitFlip: Getting Started` | Open the interactive walkthrough (great for new users) |
+| `GitFlip: Create Profile` | Guided 5-step wizard to create a new profile |
+| `GitFlip: Show Active Profile` | Display the current identity, source, and matched profile |
+| `GitFlip: Switch Profile` | Pick a profile from a quick-pick list to override the auto-detected one |
+| `GitFlip: Edit Profiles` | Open VS Code settings filtered to `gitFlip.profiles` |
+| `GitFlip: Reset to Auto` | Remove the manual override and revert to directory-based detection |
+| `GitFlip: Remove Pre-Commit Hooks` | Remove all pre-commit hooks installed by GitFlip |
 
 ## How It Works
 
 ### Profile Resolution Order
 
-When a workspace opens, Git Switcher resolves the active profile using this priority:
+When a workspace opens, GitFlip resolves the active profile using this priority:
 
 1. **Manual override** — If you used "Switch Profile" for this workspace, that choice is remembered
 2. **Directory matching** — Longest-prefix match against the `directories` configured in each profile
 3. **Repo-local config** — If the repo already has a local `user.email` that matches a profile
-4. **Default profile** — The profile named in `gitSwitcher.defaultProfile`
+4. **Default profile** — The profile named in `gitFlip.defaultProfile`
 
 If nothing matches, the status bar shows "No Profile" with a warning, and a notification offers to create or assign one.
 
@@ -244,7 +244,7 @@ If nothing matches, the status bar shows "No Profile" with a warning, and a noti
 ## Project Structure
 
 ```
-git-switcher/
+gitflip/
 ├── src/
 │   ├── extension.ts           # Entry point, command registration, lifecycle
 │   ├── types.ts               # GitProfile, ResolvedProfile, SshStrategy
@@ -300,7 +300,7 @@ Host github.com
 
 ```jsonc
 {
-  "gitSwitcher.profiles": [
+  "gitFlip.profiles": [
     {
       "name": "Work",
       "email": "you@company.com",
@@ -316,11 +316,11 @@ Host github.com
       "directories": ["~/personal"]
     }
   ],
-  "gitSwitcher.defaultProfile": "Personal"
+  "gitFlip.defaultProfile": "Personal"
 }
 ```
 
-**4. Done.** Open any repo under `~/work/` and Git Switcher applies your Work identity. Open anything under `~/personal/` and it switches to Personal. The status bar always shows which identity is active.
+**4. Done.** Open any repo under `~/work/` and GitFlip applies your Work identity. Open anything under `~/personal/` and it switches to Personal. The status bar always shows which identity is active.
 
 ## Contributing
 

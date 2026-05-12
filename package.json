@@ -1,6 +1,6 @@
 {
-  "name": "git-switcher",
-  "displayName": "Git Switcher",
+  "name": "gitflip",
+  "displayName": "GitFlip",
   "description": "Automatically switch Git identities (name, email, SSH key) based on workspace directory.",
   "version": "0.1.0",
   "publisher": "uday-jain",
@@ -24,12 +24,12 @@
   },
   "contributes": {
     "configuration": {
-      "title": "Git Switcher",
+      "title": "GitFlip",
       "properties": {
-        "gitSwitcher.profiles": {
+        "gitFlip.profiles": {
           "type": "array",
           "default": [],
-          "markdownDescription": "Your Git identity profiles. Each profile stores a **name**, **email**, and optionally an **SSH key** and **directory rules**.\n\nExample:\n```json\n[\n  {\n    \"name\": \"Work\",\n    \"email\": \"you@company.com\",\n    \"userName\": \"Your Name\",\n    \"sshKeyPath\": \"~/.ssh/id_work\",\n    \"directories\": [\"~/work\"]\n  }\n]\n```\n\nUse the command **Git Switcher: Create Profile** for a guided setup wizard.",
+          "markdownDescription": "Your Git identity profiles. Each profile stores a **name**, **email**, and optionally an **SSH key** and **directory rules**.\n\nExample:\n```json\n[\n  {\n    \"name\": \"Work\",\n    \"email\": \"you@company.com\",\n    \"userName\": \"Your Name\",\n    \"sshKeyPath\": \"~/.ssh/id_work\",\n    \"directories\": [\"~/work\"]\n  }\n]\n```\n\nUse the command **GitFlip: Create Profile** for a guided setup wizard.",
           "items": {
             "type": "object",
             "properties": {
@@ -54,7 +54,7 @@
                 "items": {
                   "type": "string"
                 },
-                "markdownDescription": "Directories where this profile should automatically activate. When you open a project inside any of these directories, Git Switcher will set this profile's identity.\n\nExample: Setting `~/work` will match `~/work/project-a`, `~/work/project-b`, etc.\n\nIf multiple profiles match, the most specific (longest) path wins."
+                "markdownDescription": "Directories where this profile should automatically activate. When you open a project inside any of these directories, GitFlip will set this profile's identity.\n\nExample: Setting `~/work` will match `~/work/project-a`, `~/work/project-b`, etc.\n\nIf multiple profiles match, the most specific (longest) path wins."
               }
             },
             "required": [
@@ -64,72 +64,72 @@
             ]
           }
         },
-        "gitSwitcher.defaultProfile": {
+        "gitFlip.defaultProfile": {
           "type": "string",
           "default": "",
           "markdownDescription": "The profile to use when no directory rule matches the current workspace. Set this to the name of one of your profiles (e.g., `Personal`).\n\nLeave empty to show a warning when no profile matches."
         },
-        "gitSwitcher.warnOnMismatch": {
+        "gitFlip.warnOnMismatch": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "Show a notification when Git Switcher detects that the repo's current identity is different from the expected profile. This helps catch cases where your identity was changed manually or by another tool."
+          "markdownDescription": "Show a notification when GitFlip detects that the repo's current identity is different from the expected profile. This helps catch cases where your identity was changed manually or by another tool."
         },
-        "gitSwitcher.autoSwitch": {
+        "gitFlip.autoSwitch": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "Automatically apply the matching profile when you open a workspace. When enabled, Git Switcher writes `user.name` and `user.email` to the repo's local Git config.\n\nDisable this if you prefer to switch profiles manually using the **Git Switcher: Switch Profile** command."
+          "markdownDescription": "Automatically apply the matching profile when you open a workspace. When enabled, GitFlip writes `user.name` and `user.email` to the repo's local Git config.\n\nDisable this if you prefer to switch profiles manually using the **GitFlip: Switch Profile** command."
         },
-        "gitSwitcher.sshStrategy": {
+        "gitFlip.sshStrategy": {
           "type": "string",
           "enum": [
             "GIT_SSH_COMMAND",
             "ssh-agent"
           ],
           "default": "GIT_SSH_COMMAND",
-          "markdownDescription": "How Git Switcher applies SSH keys:\n\n- **`GIT_SSH_COMMAND`** (recommended) — Sets an environment variable in VS Code's terminal. Safe, scoped to VS Code, no side effects on other apps.\n- **`ssh-agent`** — Adds/removes keys from your system's SSH agent. Works system-wide but affects all terminal sessions, not just VS Code."
+          "markdownDescription": "How GitFlip applies SSH keys:\n\n- **`GIT_SSH_COMMAND`** (recommended) — Sets an environment variable in VS Code's terminal. Safe, scoped to VS Code, no side effects on other apps.\n- **`ssh-agent`** — Adds/removes keys from your system's SSH agent. Works system-wide but affects all terminal sessions, not just VS Code."
         }
       }
     },
     "commands": [
       {
-        "command": "gitSwitcher.showActiveProfile",
-        "title": "Git Switcher: Show Active Profile"
+        "command": "gitFlip.showActiveProfile",
+        "title": "GitFlip: Show Active Profile"
       },
       {
-        "command": "gitSwitcher.switchProfile",
-        "title": "Git Switcher: Switch Profile"
+        "command": "gitFlip.switchProfile",
+        "title": "GitFlip: Switch Profile"
       },
       {
-        "command": "gitSwitcher.editProfiles",
-        "title": "Git Switcher: Edit Profiles"
+        "command": "gitFlip.editProfiles",
+        "title": "GitFlip: Edit Profiles"
       },
       {
-        "command": "gitSwitcher.createProfile",
-        "title": "Git Switcher: Create Profile"
+        "command": "gitFlip.createProfile",
+        "title": "GitFlip: Create Profile"
       },
       {
-        "command": "gitSwitcher.resetToAuto",
-        "title": "Git Switcher: Reset to Auto"
+        "command": "gitFlip.resetToAuto",
+        "title": "GitFlip: Reset to Auto"
       },
       {
-        "command": "gitSwitcher.removeHooks",
-        "title": "Git Switcher: Remove Pre-Commit Hooks"
+        "command": "gitFlip.removeHooks",
+        "title": "GitFlip: Remove Pre-Commit Hooks"
       },
       {
-        "command": "gitSwitcher.openWalkthrough",
-        "title": "Git Switcher: Getting Started"
+        "command": "gitFlip.openWalkthrough",
+        "title": "GitFlip: Getting Started"
       }
     ],
     "walkthroughs": [
       {
-        "id": "gitSwitcher.gettingStarted",
-        "title": "Getting Started with Git Switcher",
+        "id": "gitFlip.gettingStarted",
+        "title": "Getting Started with GitFlip",
         "description": "Learn how to set up automatic Git identity switching in a few simple steps.",
         "steps": [
           {
             "id": "understand",
             "title": "Why Git Identities Matter",
-            "description": "Understand the problem Git Switcher solves — no Git expertise required.",
+            "description": "Understand the problem GitFlip solves — no Git expertise required.",
             "media": {
               "markdown": "media/walkthrough/understand.md"
             }
@@ -137,34 +137,34 @@
           {
             "id": "createProfile",
             "title": "Create Your First Profile",
-            "description": "Set up a profile with your name, email, and SSH key.\n\n[Create Profile](command:gitSwitcher.createProfile)",
+            "description": "Set up a profile with your name, email, and SSH key.\n\n[Create Profile](command:gitFlip.createProfile)",
             "media": {
               "markdown": "media/walkthrough/create-profile.md"
             },
             "completionEvents": [
-              "onCommand:gitSwitcher.createProfile"
+              "onCommand:gitFlip.createProfile"
             ]
           },
           {
             "id": "directoryRules",
             "title": "Set Up Directory Rules",
-            "description": "Map folders to profiles so switching happens automatically.\n\n[Edit Profiles](command:gitSwitcher.editProfiles)",
+            "description": "Map folders to profiles so switching happens automatically.\n\n[Edit Profiles](command:gitFlip.editProfiles)",
             "media": {
               "markdown": "media/walkthrough/directory-rules.md"
             },
             "completionEvents": [
-              "onCommand:gitSwitcher.editProfiles"
+              "onCommand:gitFlip.editProfiles"
             ]
           },
           {
             "id": "verify",
             "title": "Verify It Works",
-            "description": "Check the status bar and test with a commit.\n\n[Show Active Profile](command:gitSwitcher.showActiveProfile)",
+            "description": "Check the status bar and test with a commit.\n\n[Show Active Profile](command:gitFlip.showActiveProfile)",
             "media": {
               "markdown": "media/walkthrough/verify.md"
             },
             "completionEvents": [
-              "onCommand:gitSwitcher.showActiveProfile"
+              "onCommand:gitFlip.showActiveProfile"
             ]
           }
         ]

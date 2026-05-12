@@ -29,14 +29,14 @@ export function showSshKeyApplied(keyPath: string): void {
 export async function showNoProfileMatch(folderName: string): Promise<void> {
   once(`no-match:${folderName}`, () => {
     vscode.window.showWarningMessage(
-      `No Git Switcher profile matches "${folderName}". Commits will use whatever identity is in your Git config.`,
+      `No GitFlip profile matches "${folderName}". Commits will use whatever identity is in your Git config.`,
       'Create Profile',
       'Assign Profile',
     ).then(action => {
       if (action === 'Create Profile') {
-        vscode.commands.executeCommand('gitSwitcher.createProfile');
+        vscode.commands.executeCommand('gitFlip.createProfile');
       } else if (action === 'Assign Profile') {
-        vscode.commands.executeCommand('gitSwitcher.switchProfile');
+        vscode.commands.executeCommand('gitFlip.switchProfile');
       }
     });
   });
@@ -44,7 +44,7 @@ export async function showNoProfileMatch(folderName: string): Promise<void> {
 
 export async function showFirstRunWelcome(): Promise<string | undefined> {
   return vscode.window.showInformationMessage(
-    'Welcome to Git Switcher! Automatically switch your Git identity based on project folder.',
+    'Welcome to GitFlip! Automatically switch your Git identity based on project folder.',
     'Get Started',
     'Create Profile',
     'Later',
@@ -59,9 +59,9 @@ export function showPostImport(count: number, names: string[]): void {
     'Open Walkthrough',
   ).then(action => {
     if (action === 'View in Settings') {
-      vscode.commands.executeCommand('workbench.action.openSettings', 'gitSwitcher.profiles');
+      vscode.commands.executeCommand('workbench.action.openSettings', 'gitFlip.profiles');
     } else if (action === 'Open Walkthrough') {
-      vscode.commands.executeCommand('gitSwitcher.openWalkthrough');
+      vscode.commands.executeCommand('gitFlip.openWalkthrough');
     }
   });
 }

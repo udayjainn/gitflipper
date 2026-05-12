@@ -8,8 +8,8 @@ When you commit code with Git, every commit records **your name and email**. If 
 - Your work email appears on your open-source contributions
 - Pushing fails because the wrong SSH key is used for authentication
 
-**How Git Switcher helps:**
+**How GitFlip helps:**
 
-You create **profiles** — each one stores a name, email, and optionally an SSH key. Then you tell Git Switcher which folders belong to which profile. When you open a project, it automatically sets the right identity.
+You create **profiles** — each one stores a name, email, and optionally an SSH key. Then you tell GitFlip which folders belong to which profile. When you open a project, it automatically sets the right identity.
 
 No more manual `git config` commands. No more wrong-email commits.
