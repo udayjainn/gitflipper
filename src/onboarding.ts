@@ -124,7 +124,7 @@ export class Onboarding {
     const dir = entry.condition.replace(/\/$/, '');
     const base = path.basename(dir);
     const lower = base.toLowerCase();
-    if (lower.includes('work') || lower.includes('company') || lower.includes('flexspring')) {
+    if (lower.includes('work') || lower.includes('company') || lower.includes('corp')) {
       return 'Work';
     }
     if (lower.includes('personal') || lower.includes('home')) {

@@ -46,7 +46,7 @@ export class ProfileManager {
 
     const userName = await vscode.window.showInputBox({
       prompt: 'Git user name',
-      placeHolder: 'Uday Jain',
+      placeHolder: 'John Doe',
       validateInput: v => v.trim() ? null : 'User name is required',
     });
     if (!userName) { return undefined; }
