@@ -2,7 +2,7 @@
   "name": "gitflipper",
   "displayName": "GitFlipper",
   "description": "Automatically switch Git identities (name, email, SSH key) based on workspace directory.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "UdayJain",
   "icon": "media/icon.png",
   "license": "ISC",
