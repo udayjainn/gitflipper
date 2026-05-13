@@ -99,7 +99,7 @@ export function activate(context: vscode.ExtensionContext) {
     if (!warnOnMismatch) { return; }
 
     vscode.window.showWarningMessage(
-      `GitFlip: Switching identity in "${state.folder.name}" from "${currentEmail}" to "${state.resolved.profile.email}" (${state.resolved.profile.name}).`
+      `GitFlipper: Switching identity in "${state.folder.name}" from "${currentEmail}" to "${state.resolved.profile.email}" (${state.resolved.profile.name}).`
     );
   }
 
@@ -176,7 +176,7 @@ export function activate(context: vscode.ExtensionContext) {
         const git = simpleGit(active.uri.fsPath);
         const current = await configWriter.getCurrentRepoIdentity(git);
         vscode.window.showInformationMessage(
-          `No profile matched for "${active.name}". Current repo identity: ${current.name || 'unset'} <${current.email || 'unset'}>. Use "GitFlip: Create Profile" to set one up.`
+          `No profile matched for "${active.name}". Current repo identity: ${current.name || 'unset'} <${current.email || 'unset'}>. Use "GitFlipper: Create Profile" to set one up.`
         );
       }
     }),
@@ -268,7 +268,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('gitFlip.openWalkthrough', () => {
       vscode.commands.executeCommand(
         'workbench.action.openWalkthrough',
-        'uday-jain.gitflip#gitFlip.gettingStarted',
+        'UdayJain.gitflipper#gitFlip.gettingStarted',
         false,
       );
     }),

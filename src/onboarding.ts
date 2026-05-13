@@ -72,7 +72,7 @@ export class Onboarding {
       .join(', ');
 
     const action = await vscode.window.showInformationMessage(
-      `GitFlip found ${validEntries.length} existing Git identity rule(s) in your ~/.gitconfig file: ${labels}. These are directory-based identity rules you've already set up. Import them as profiles?`,
+      `GitFlipper found ${validEntries.length} existing Git identity rule(s) in your ~/.gitconfig file: ${labels}. These are directory-based identity rules you've already set up. Import them as profiles?`,
       'Import All',
       'Skip',
     );
@@ -114,7 +114,7 @@ export class Onboarding {
 
   private async offerCreateProfile(): Promise<boolean> {
     const action = await vscode.window.showInformationMessage(
-      'Welcome to GitFlip! Create profiles to automatically switch your Git identity based on which folder you\'re working in.',
+      'Welcome to GitFlipper! Create profiles to automatically switch your Git identity based on which folder you\'re working in.',
       'Get Started',
       'Create Profile',
       'Later',

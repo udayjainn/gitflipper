@@ -109,7 +109,7 @@ export class ProfileManager {
 
     const hasDir = profile.directories && profile.directories.length > 0;
     const nextSteps = hasDir
-      ? `GitFlip will auto-apply this identity when you open projects in ${profile.directories!.join(', ')}.`
+      ? `GitFlipper will auto-apply this identity when you open projects in ${profile.directories!.join(', ')}.`
       : 'Tip: Add directory rules in settings so this profile activates automatically for certain folders.';
 
     vscode.window.showInformationMessage(

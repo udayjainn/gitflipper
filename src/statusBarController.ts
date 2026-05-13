@@ -53,7 +53,7 @@ export class StatusBarController {
     const md = new vscode.MarkdownString('', true);
     md.isTrusted = true;
 
-    md.appendMarkdown(`**GitFlip — ${name}**\n\n`);
+    md.appendMarkdown(`**GitFlipper — ${name}**\n\n`);
     md.appendMarkdown(`| Property | Value |\n|---|---|\n`);
     md.appendMarkdown(`| **Name** | ${userName} |\n`);
     md.appendMarkdown(`| **Email** | ${email} |\n`);
@@ -75,7 +75,7 @@ export class StatusBarController {
     md.isTrusted = true;
 
     const folder = folderName ? ` for "${folderName}"` : '';
-    md.appendMarkdown(`**GitFlip — No Profile${folder}**\n\n`);
+    md.appendMarkdown(`**GitFlipper — No Profile${folder}**\n\n`);
     md.appendMarkdown(`No profile is configured for this workspace. `);
     md.appendMarkdown(`Commits will use whatever identity is in your Git config.\n\n`);
     md.appendMarkdown(`---\n`);

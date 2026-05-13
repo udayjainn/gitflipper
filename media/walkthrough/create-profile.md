@@ -9,7 +9,7 @@ A **profile** is a saved Git identity — a name, email, and optional SSH key.
 **To create a profile:**
 
 1. Open the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
-2. Type **"GitFlip: Create Profile"**
+2. Type **"GitFlipper: Create Profile"**
 3. Follow the 5-step wizard:
    - **Profile name** — something descriptive like "Work" or "Personal"
    - **Git name** — the name shown on commits (e.g., "Jane Doe")

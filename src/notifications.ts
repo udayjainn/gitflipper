@@ -29,7 +29,7 @@ export function showSshKeyApplied(keyPath: string): void {
 export async function showNoProfileMatch(folderName: string): Promise<void> {
   once(`no-match:${folderName}`, () => {
     vscode.window.showWarningMessage(
-      `No GitFlip profile matches "${folderName}". Commits will use whatever identity is in your Git config.`,
+      `No GitFlipper profile matches "${folderName}". Commits will use whatever identity is in your Git config.`,
       'Create Profile',
       'Assign Profile',
     ).then(action => {
@@ -44,7 +44,7 @@ export async function showNoProfileMatch(folderName: string): Promise<void> {
 
 export async function showFirstRunWelcome(): Promise<string | undefined> {
   return vscode.window.showInformationMessage(
-    'Welcome to GitFlip! Automatically switch your Git identity based on project folder.',
+    'Welcome to GitFlipper! Automatically switch your Git identity based on project folder.',
     'Get Started',
     'Create Profile',
     'Later',

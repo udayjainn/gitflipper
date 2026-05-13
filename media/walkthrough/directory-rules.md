@@ -1,6 +1,6 @@
 ## Set Up Directory Rules
 
-Directory rules are what make GitFlip automatic. You map folders to profiles, and the extension handles the rest.
+Directory rules are what make GitFlipper automatic. You map folders to profiles, and the extension handles the rest.
 
 **Example setup:**
 
