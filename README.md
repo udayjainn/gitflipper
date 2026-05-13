@@ -2,6 +2,8 @@
 
 A VS Code extension that automatically switches your Git identity (name, email, SSH key) based on your workspace directory. Stop committing to your work repo with your personal email, or vice versa.
 
+![GitFlipper Banner](media/marketplace-banner-1280x640.png)
+
 ## The Problem
 
 If you use one machine for both work and personal projects, you've probably:
@@ -12,6 +14,8 @@ If you use one machine for both work and personal projects, you've probably:
 - Had your personal email show up in your company's commit history
 
 GitFlipper eliminates all of this. You configure your profiles once, map them to directories, and the extension handles the rest automatically.
+
+![Before and After](media/marketplace-feature-05-before-after.png)
 
 ## Features
 
@@ -25,6 +29,8 @@ New to GitFlipper? Run **GitFlipper: Getting Started** from the Command Palette 
 4. **Verify It Works** — check the status bar and test with a commit
 
 ### Guided Profile Creation
+
+![Profile Wizard](media/marketplace-feature-03-wizard.png)
 
 The **Create Profile** wizard walks you through 5 steps with helpful defaults:
 
@@ -41,6 +47,8 @@ After all steps, you see a summary confirmation. Once created, the extension tel
 ### Automatic Identity Switching
 
 Define directory rules per profile. When you open a workspace, GitFlipper detects which directory you're in and applies the correct Git identity to the repo's local config.
+
+![Auto-switching](media/marketplace-feature-01-auto-switch.png)
 
 ```
 ~/work/         -> Work profile  (you@company.com)
@@ -62,6 +70,8 @@ Each notification shows at most once per session to avoid spam.
 
 Always know which identity is active. Click the status bar item to switch profiles.
 
+![Status Bar](media/marketplace-feature-02-status-bar.png)
+
 | Icon | Meaning |
 |------|---------|
 | :white_check_mark: | Profile auto-detected from directory rules |
@@ -74,6 +84,8 @@ Always know which identity is active. Click the status bar item to switch profil
 In multi-root workspaces, the status bar also shows which folder it refers to.
 
 ### Pre-Commit Identity Guard
+
+![Pre-commit Guard](media/marketplace-feature-04-guard.png)
 
 A git `pre-commit` hook is automatically installed that blocks commits when your identity doesn't match the expected profile:
 

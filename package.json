@@ -4,7 +4,12 @@
   "description": "Automatically switch Git identities (name, email, SSH key) based on workspace directory.",
   "version": "0.1.0",
   "publisher": "UdayJain",
+  "icon": "media/icon.png",
   "license": "ISC",
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/udayjainn/gitflipper"
